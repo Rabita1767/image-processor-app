@@ -1,0 +1,10 @@
+import express from "express";
+import imageController from "../controllers/imageController";
+import authMiddleware from "../middlewares/authMiddleware";
+import { upload } from "../config/multer";
+const router=express.Router();
+router.post("/upload",authMiddleware.auth,upload.single("image"),imageController.uploadImage);
+router.post("/compress/:id",authMiddleware.auth,imageController.compressImage);
+router.post("/download/:id",authMiddleware.auth,imageController.downloadProcessedImage);
+router.get("/:id",authMiddleware.auth,imageController.getImageById);
+export default router;
