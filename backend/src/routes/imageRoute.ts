@@ -7,4 +7,5 @@ router.post("/upload",authMiddleware.auth,upload.single("image"),imageController
 router.post("/compress/:id",authMiddleware.auth,imageController.compressImage);
 router.post("/download/:id",authMiddleware.auth,imageController.downloadProcessedImage);
 router.get("/:id",authMiddleware.auth,imageController.getImageById);
+router.post("/upload-and-compress",authMiddleware.auth,upload.single("image"),imageController.compressImageUpdated);
 export default router;

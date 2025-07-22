@@ -9,6 +9,7 @@ class ImageController{
     public async uploadImage(req:CustomRequest,res:Response,next:NextFunction):Promise<void>
     {
         try {
+            console.log("Uploading image");
             const uploadImage=await imageService.uploadImage(req.userId,req.file);
             return sendResponse(res,HTTP_STATUS.CREATED,Messages.CREATED,uploadImage);
         } catch (error) {
@@ -44,6 +45,18 @@ class ImageController{
         } catch (error) {
             console.log(error)
             return sendResponse(res,HTTP_STATUS.INTERNAL_SERVER_ERROR,Messages.INTERNAL_SERVER_ERROR,error);
+        }
+    }
+
+    public async compressImageUpdated(req:CustomRequest,res:Response,next:NextFunction):Promise<void>{
+        try{
+            console.log("Compressing and uploading image");
+            const uploadAndCompress= await imageService.uploadAndCompress(req.userId,req.file);
+            return sendResponse(res,HTTP_STATUS.CREATED,Messages.IMAGE_UPLOADED_AND_COMPRESSED_SUCCESSFULLY,uploadAndCompress);
+        }
+        catch(error){
+            console.log(error);
+            next(error);
         }
     }
 

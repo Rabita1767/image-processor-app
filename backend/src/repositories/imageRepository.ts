@@ -9,6 +9,14 @@ class ImageRepository {
         })
     }
 
+    public async uploadImageAsGuest(payload:IFile):Promise<IImage> {
+        return await ImageModel.create({
+            user:"guest",
+            filename:payload.filename,
+            originalPath:payload.path
+        })
+    }
+
     public async findImageById(id:string):Promise<IImage | null>{
         return await ImageModel.findById({_id:id});
     }

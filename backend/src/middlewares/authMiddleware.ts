@@ -15,11 +15,7 @@ class AuthMiddleware {
       let accessToken = req.headers.authorization;
       let token = accessToken?.split(" ")[1];
       if (!token) {
-        return sendResponse(
-          res,
-          HTTP_STATUS.UNAUTHORIZED,
-          Messages.UNAUTHORIZED
-        );
+        return next();
       }
       // Verify token
       const decodedToken = jwt.verify(

@@ -4,6 +4,7 @@ import imageRepository from "../repositories/imageRepository";
 import {  IImage, IFile} from "../types";
 import AppError from "../utils/AppError";
 import { Messages } from "../utils/messages";
+import fs from "fs";
 
  class ImageService {
     public async uploadImage(userId:string | undefined,payload:IFile | undefined):Promise<IImage>{
@@ -82,6 +83,45 @@ import { Messages } from "../utils/messages";
             console.log(error);
             throw new Error(Messages.IMAGE_NOT_FOUND);
             
+        }
+    }
+
+    private async uploadAndCompressAsGuest(payload:IFile | undefined):Promise<string>{
+       try {
+        if(!payload)
+        {
+            throw new AppError(Messages.FILE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
+        }
+        const uploadImageAsGuest=await imageRepository.uploadImageAsGuest(payload);
+        if(!uploadImageAsGuest)
+        {
+            throw new AppError(Messages.IMAGE_NOT_UPLOADED,HTTP_STATUS.BAD_REQUEST);
+        }
+        const channel= await getRabbitChannel();
+        const filePath = payload.path;
+        const imageBuffer = fs.readFileSync(filePath);
+        channel.sendToQueue("compress",Buffer.from(JSON.stringify({
+            imageId: uploadImageAsGuest._id,
+            image:imageBuffer.toString('base64'),
+            userId:"guest",
+            fileName: payload.filename,
+        })))
+        console.log("Message sent to queue");
+        return payload.path;
+       } catch (error) {
+            console.log(error);
+            throw new AppError(Messages.ERROR_UPLOADING_IMAGE,HTTP_STATUS.BAD_REQUEST);
+       }
+
+    }
+
+    public async uploadAndCompress(userId:string | undefined,payload:IFile | undefined):Promise<any>{
+        if(!userId)
+        {
+            console.log("payloaddddd",payload);
+        }
+        else {
+            console.log("userId",userId);
         }
     }
 
