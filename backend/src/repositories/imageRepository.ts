@@ -1,10 +1,12 @@
+import mongoose from "mongoose";
 import ImageModel from "../models/imageModel";
 import { IFile, IImage } from "../types";
 class ImageRepository {
 
-    public async uploadImage(userId:string | undefined ,payload:IFile):Promise<IImage> {
+    public async uploadImage(userId:mongoose.Types.ObjectId | undefined ,payload:IFile):Promise<IImage> {
+        console.log("userrrrr",userId);
         return await ImageModel.create({
-            user:userId || "guest",
+            user:userId ,
             filename:payload.filename,
             originalPath:payload.path
         })

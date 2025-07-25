@@ -5,6 +5,7 @@ import {  IImage, IFile} from "../types";
 import AppError from "../utils/AppError";
 import { Messages } from "../utils/messages";
 import fs from "fs";
+import mongoose from "mongoose";
 
  class ImageService {
     
@@ -49,11 +50,17 @@ import fs from "fs";
         }
     }
 
-    public async uploadAndCompress(userId:string | undefined,payload:IFile | undefined):Promise<string>{
+    public async uploadAndCompress(userId:mongoose.Types.ObjectId | undefined,payload:IFile | undefined):Promise<string>{
        try {
         if(!payload)
         {
             throw new AppError(Messages.FILE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
+        }
+        if(!userId)
+        {
+            const customUserId = new mongoose.Types.ObjectId();
+            userId = customUserId;
+            console.log("User ID:", userId);
         }
         const uploadImage=await imageRepository.uploadImage(userId,payload);
         if(!uploadImage)
