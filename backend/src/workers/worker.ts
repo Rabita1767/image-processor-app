@@ -4,7 +4,9 @@ import sharp from "sharp";
 import dotenv from "dotenv";
 import databaseConnection from "../config/database";
 import imageRepository from "../repositories/imageRepository";
+import {io} from "../server";
 dotenv.config();
+
 const compressAndSave=async(buffer:ArrayBuffer,filename:string):Promise<string>=>{
     const outputPath = path.join('compressed', filename);
     await sharp(buffer)
@@ -31,6 +33,10 @@ channel.consume("compress",async(msg)=>{
             {
                 throw new Error("Image not found");
             }
+            io.to(userId).emit("image-compressed",{
+                imageId,
+                outputPath
+            })
             console.log("Image processed and saved at:", outputPath);
             channel.ack(msg) 
         } catch (error) {

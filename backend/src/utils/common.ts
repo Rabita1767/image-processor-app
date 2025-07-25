@@ -39,8 +39,8 @@ export const generateToken = async (tokenData: IUser): Promise<IToken> => {
     const accessToken =  jwt.sign(
       {
         id: tokenData._id,
-        name: tokenData.userName,
-        email: tokenData.email,
+        name: tokenData.userName ?? "guest",
+        email: tokenData.email ?? "guest@gmail.com",
       },
       process.env.JWT_ACCESS_SECRET as string,
       { expiresIn: "1h" }
@@ -48,8 +48,8 @@ export const generateToken = async (tokenData: IUser): Promise<IToken> => {
     const refreshToken =  jwt.sign(
       {
         id: tokenData._id,
-        name: tokenData.userName,
-        email: tokenData.email,
+        name: tokenData.userName ?? "guest",
+        email: tokenData.email ?? "guest@gmail.com",
       },
       process.env.JWT_ACCESS_SECRET as string,
       { expiresIn: "7d" }
