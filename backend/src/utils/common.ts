@@ -34,7 +34,7 @@ export const sendResponse = (
   res.status(status).send(response);
 };
 
-export const generateToken = async (tokenData: IUser): Promise<IToken> => {
+export const generateToken = async (tokenData: any): Promise<IToken> => {
   try {
     const accessToken =  jwt.sign(
       {

@@ -23,16 +23,17 @@ app.use("/api/v1/image", imageRoute);
 // Error Handling Middleware
 app.use(errorHandler);
 
-io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`);
-    socket.on("join", (userId) => {
-        socket.join(userId); // Room = userId
-        console.log(`✅ User ${userId} joined room`);
-      });
-    
-      socket.on("disconnect", () => {
-        console.log("❌ Client disconnected:", socket.id);
-      });
-});
+io.on("connection",(socket)=>{
+  const userId = socket.handshake.query.userId;
+  if (userId) {
+    socket.join(userId); 
+    console.log(`Socket joined room: ${userId}`);
+  }
+  console.log("User is connected",socket.id);
+  socket.on("disconnect",()=>{
+    console.log('User is disconnected',socket.id);
+  })
+})
+  
 
 export { server, io };

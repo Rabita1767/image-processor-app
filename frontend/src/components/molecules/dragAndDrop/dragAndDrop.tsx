@@ -3,25 +3,35 @@ import Input from "@/components/atoms/input/input";
 import { useCallback, useState } from "react";
 import Image from "next/image";
 import UploadImage from "@/app/assets/images/upload.png";
+import { on } from "events";
 interface IDragAndDrop {
     onInputChange: (value:string) => void;
+    onDrop: (file: File) => void;
 
 }
-const DragAndDrop:React.FC<IDragAndDrop>=({onInputChange})=>{
+const DragAndDrop:React.FC<IDragAndDrop>=({onInputChange,onDrop})=>{
     const [preview, setPreview] = useState<string | null>(null);
     const [isDrop,setIsDrop] = useState<boolean>(false);
-const onDrop=useCallback((e:React.DragEvent<HTMLDivElement>)=>{
-    e.preventDefault();
-    setIsDrop(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/"))
-    {
-        const imageUrl = URL.createObjectURL(file);
-        setPreview(imageUrl);
-    }
-},[]);
+// const onDrop=useCallback((e:React.DragEvent<HTMLDivElement>)=>{
+//     e.preventDefault();
+//     setIsDrop(false);
+//     const file = e.dataTransfer.files?.[0];
+//     if (file && file.type.startsWith("image/"))
+//     {
+//         const imageUrl = URL.createObjectURL(file);
+//         setPreview(imageUrl);
+//     }
+// },[]);
 
 console.log("preview", preview);
+
+const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      onDrop(file);
+    }
+  };
 
 const onDragOver=(e:React.DragEvent<HTMLDivElement>)=>{
     e.preventDefault();
@@ -38,7 +48,7 @@ const onDragLeave=(e:React.DragEvent<HTMLDivElement>)=>{
             <div className="flex flex-col gap-4 w-[80%] mx-auto my-10 p-4">
             <p className="text-black text-[24px] font-bold">Upload photos</p>
             <div className="border-2 border-dashed border-gray-300 h-[500px] flex flex-col justify-center items-center cursor-pointer rounded-lg"
-            onDrop={onDrop}
+            onDrop={handleDrop}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             >

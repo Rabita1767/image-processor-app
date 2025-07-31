@@ -7,7 +7,8 @@ export interface IUser extends Document {
 }
 
 export interface IImage extends Document {
-  user: Types.ObjectId;
+  user?: Types.ObjectId;
+  guestId?: string;
   filename: string;
   originalPath: string;
   processedPath?: string;
@@ -43,7 +44,7 @@ export interface ILoginResponse {
 }
 
 export interface CustomRequest extends Request {
-  userId?: mongoose.Types.ObjectId;
+  userId?: String ;
 }
 export interface IFile {
   fieldname: string;

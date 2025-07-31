@@ -26,10 +26,10 @@ class ImageController{
         }
     }
 
-    public async compressImageUpdatedAsGuest(req:Request,res:Response,next:NextFunction):Promise<void>{
+    public async compressImageUpdatedAsGuest(req:CustomRequest,res:Response,next:NextFunction):Promise<void>{
         try{
             console.log("Compressing and uploading image as Guest");
-            const uploadAndCompress= await imageService.uploadAndCompressAsGuest(req.file);
+            const uploadAndCompress= await imageService.uploadAndCompressAsGuest(req.userId,req.file);
             return sendResponse(res,HTTP_STATUS.CREATED,Messages.IMAGE_UPLOADED_AND_COMPRESSED_SUCCESSFULLY,uploadAndCompress);
         }
         catch(error){
