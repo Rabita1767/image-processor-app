@@ -10,8 +10,8 @@ export interface IImage extends Document {
   user?: Types.ObjectId;
   guestId?: string;
   filename: string;
-  originalPath: string;
-  processedPath?: string;
+  originalImageUrl: string;
+  processedImageUrl?: string;
   status: "pending" | "processing" | "done" | "failed";
 }
 
@@ -44,7 +44,7 @@ export interface ILoginResponse {
 }
 
 export interface CustomRequest extends Request {
-  userId?: String ;
+  userId?: String;
 }
 export interface IFile {
   fieldname: string;
@@ -56,7 +56,7 @@ export interface IFile {
   filename: string;
   path: string;
 }
-export interface IImagePayload{
+export interface IImagePayload {
   file: IFile;
 }
 

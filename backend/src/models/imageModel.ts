@@ -5,8 +5,8 @@ const imageSchema = new Schema<IImage>({
   user:         { type: Schema.Types.ObjectId , ref: "User" },
   guestId:      {type:String},
   filename:     { type: String, required: true },
-  originalPath: { type: String, required: true },
-  processedPath:{ type: String },
+  originalImageUrl: { type: String, required: true },
+  processedImageUrl:{ type: String },
   status:       { type: String, enum: ["pending", "processing", "done", "failed"], default: "pending" },
 }, {
   timestamps: true

@@ -1,16 +1,8 @@
 import { io } from "socket.io-client";
 
-let socket:any;
+const socket = io(process.env.NEXT_PUBLIC_BASE_URL, {
+  autoConnect: false, 
+  transports: ["websocket"], 
+});
 
-export const getSocket=(userId:string)=>{
-    if(!socket &&  typeof window!==undefined)
-    {
-        socket=io(`${process.env.NEXT_PUBLIC_BASE_URL}`, {
-            autoConnect: false,
-            transports: ["websocket"],
-            query: { userId },
-        });
-    }
-    
-    return socket;
-}
+export default socket;

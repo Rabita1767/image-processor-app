@@ -2,13 +2,15 @@
 import Image, { StaticImageData } from "next/image";
 import Button from "@/components/atoms/button/button";
 import ProgressBar from "@/components/atoms/progressBar/progressBar";
+import { File } from "buffer";
 
 interface IImagePreview {
     imgSrc: string | StaticImageData;
     imgTitle:string;
+    progress?: number;
 }
 
-const ImagePreview:React.FC<IImagePreview>=({imgSrc,imgTitle})=>{
+const ImagePreview:React.FC<IImagePreview>=({imgSrc,imgTitle,progress})=>{
     return(
         <div className="flex flex-col w-[80%] mx-auto border-2 border-gray-300 p-4 rounded-lg items-center gap-4">
         <div className="flex flex-row gap-2 justify-between w-full">
@@ -20,7 +22,7 @@ const ImagePreview:React.FC<IImagePreview>=({imgSrc,imgTitle})=>{
                 <Button onClick={()=>{console.log("clicked")}} type="submit"/>
             </div>
         </div>
-        <ProgressBar progress={50} />
+        <ProgressBar progress={progress ?? 0} />
         </div>
     )
 }
