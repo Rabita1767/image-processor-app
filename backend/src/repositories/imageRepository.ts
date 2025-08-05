@@ -3,13 +3,13 @@ import ImageModel from "../models/imageModel";
 import { IFile, IImage } from "../types";
 class ImageRepository {
   public async uploadImageAsGuest(
-    payload: any,
+    userId: string | undefined,
+    fileName: any,
     originalImageUrl: string
   ): Promise<IImage> {
-    console.log("payloadddddddd", payload);
     return await ImageModel.create({
-      guestId: payload?.userId,
-      filename: payload.fileName,
+      guestId: userId,
+      filename: fileName,
       originalImageUrl: originalImageUrl,
     });
   }

@@ -54,16 +54,13 @@ export const consumeQueue = async (io: Server) => {
       if (!updateImage) {
         throw new Error("Image not found");
       }
-      //   sendNotification(userId, {
-      //     message: "Image compressed successfully",
-      //     imageId: imageId,
-      //     compressedImageUrl: outputPath,
-      //   });
-      // io.to(userId).emit("notification",{
-      //     message: "Image compressed successfully",
-      //     imageId: imageId,
-      //     compressedImageUrl: outputPath
-      // });
+        io.emit("notification", {
+          message: "Image compressed successfully",
+          imageId: "123",
+          compressedImageUrl: outputPath,
+        });
+      
+
       console.log("Image processed and saved at:", outputPath);
       channel.ack(msg);
     } catch (error) {

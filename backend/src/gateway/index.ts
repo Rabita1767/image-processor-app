@@ -6,39 +6,40 @@ import { getRabbitChannel } from "../config/rabbitMq";
 import uploadToCloudinaryFromBuffer from "../utils/cloudinary";
 
 const socketGateway = async (socket: Socket) => {
+  const userId = socket.handshake.query.userId || "";
+  console.log("guuuuu", userId);
+  // socket.join(userId);
   const users: any = {};
 
   console.log("New client connected", socket.id);
+
   socket.on("authentication", async (data) => {
-    console.log("User uploaded data", data);
-    users[data?.userId] = socket.id;
-    socket.join(data?.userId);
-    console.log("User joined room", data?.userId);
-    console.log("Current users map:", users);
-    if (!data?.imageBuffer) {
-      socket.emit("upload-error", {
-        error: "Image buffer is required",
-      });
-      return;
-    }
     try {
+      socket.join(userId);
+      console.log("User uploaded data", data);
+      const base64Data = data?.base64Image.replace(
+        /^data:image\/\w+;base64,/,
+        ""
+      );
+      const buffer = Buffer.from(base64Data, "base64");
+
       const originalUrl = await uploadToCloudinaryFromBuffer(
-        data?.imageBuffer,
-        data?.fileName
+        buffer,
+        data.fileName || "uploaded_image"
       );
       const uploadImage = await imageRepository.uploadImageAsGuest(
-        data,
+        userId as string,
+        data?.fileName,
         originalUrl
       );
       if (!uploadImage) {
         console.error("Error saving image to database");
         return socket.emit("upload-error", { error: "Failed to save image" });
       }
+
       socket.emit("upload-success", {
         message: "Image uploaded successfully",
-        imageId: uploadImage._id,
-        originalImageUrl: uploadImage.originalImageUrl,
-        fileName: uploadImage.filename,
+        imageUrl: originalUrl,
       });
       const channel = await getRabbitChannel();
       channel.sendToQueue(
@@ -46,20 +47,21 @@ const socketGateway = async (socket: Socket) => {
         Buffer.from(
           JSON.stringify({
             imageId: uploadImage._id,
-            image: uploadImage.originalImageUrl,
-            userId: data.userId,
+            image: buffer,
+            userId: userId,
             fileName: uploadImage.filename,
           })
         )
       );
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      return socket.emit("upload-error", { error: "Failed to upload image" });
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      socket.emit("upload-error", { error: err.message });
     }
   });
 
-  socket.on("hello", (data) => {
-    console.log("helloooo", data);
+  socket.emit("hello", {
+    message: "Hello from the server!",
+    socketId: socket.id,
   });
 
   socket.on("disconnect", () => {
