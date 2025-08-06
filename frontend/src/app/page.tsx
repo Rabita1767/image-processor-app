@@ -4,16 +4,16 @@ import ImagePreview from "@/components/molecules/imagePreview/imagePreview";
 import exampleImage from "@/app/assets/images/upload.png";
 import { useEffect, useState } from "react";
 import socket from "@/socket/socket";
+import { IImage } from "@/types/types";
 export default function Home() {
-  const [hasUploaded, setHasUploaded] = useState(false);
-  const [image, setImage] = useState<File | null>(null);
-  const [isDone, setIsDone] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [originalImage, setOriginalImage] = useState<File[]>([]);
+  const [image, setImage] = useState<IImage[]>([]);
 
   const handleImageDrop = (file: File) => {
     if (!socket.connected) {
       socket.connect();
     }
+    setOriginalImage((prev) => [...prev, file]);
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result;
@@ -26,11 +26,34 @@ export default function Home() {
     reader.readAsDataURL(file);
   };
 
+  const handleDownload = (url: string, filename: string) => {
+    // Append fl_attachment transformation to force download
+    const downloadUrl = url.includes("?")
+      ? `${url}&fl_attachment`
+      : `${url}?fl_attachment`;
+
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   useEffect(() => {
     socket.on("notification", (data) => {
       console.log("Got notification:", data);
-      setImage(data?.compressedImageUrl);
-      setIsDone(true);
+      setImage((prev) => [
+        ...prev,
+        {
+          originalImageFile: data?.originalImageUrl,
+          fileName: data?.fileName,
+          imageId: data?.imageId,
+          compressedImageFile: data?.compressedImageUrl,
+          progress: 100,
+          done: true,
+        },
+      ]);
     });
     socket.on("hello", (data) => {
       console.log("helloooooo", data);
@@ -52,21 +75,35 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (isDone) {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          } else {
-            return prev + 5;
-          }
-        });
-      }, 50);
-    } else {
-      setProgress(0);
-    }
-  }, [isDone]);
+    const intervals: NodeJS.Timeout[] = [];
+
+    // Loop over all images
+    image.forEach((img, index) => {
+      if (img.done && img.progress < 100) {
+        const interval = setInterval(() => {
+          setImage((prevImages) => {
+            const updatedImages = [...prevImages];
+            const current = updatedImages[index];
+
+            if (current.progress >= 100) {
+              clearInterval(interval);
+              current.progress = 100;
+            } else {
+              current.progress += 5;
+            }
+
+            return updatedImages;
+          });
+        }, 50);
+
+        intervals.push(interval);
+      }
+    });
+
+    return () => {
+      intervals.forEach(clearInterval);
+    };
+  }, [image]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen w-full bg-white">
@@ -74,11 +111,29 @@ export default function Home() {
         onInputChange={(value: string) => console.log("value", value)}
         onDrop={handleImageDrop}
       />
-      <ImagePreview
-        imgSrc={image || exampleImage}
-        imgTitle="example.png"
-        progress={progress}
-      />
+      {originalImage &&
+        originalImage.length > 0 &&
+        originalImage.map((img: any, index: number) => (
+          <ImagePreview
+            key={index}
+            imgSrc={
+              image[index]?.progress === 100
+                ? image[index]?.compressedImageFile
+                : image[index]?.originalImageFile || exampleImage
+            }
+            imgTitle="example.png"
+            progress={image[index]?.progress || 0}
+            btnText={
+              image[index]?.done ? "Download" : "Compression in Progress"
+            }
+            clickHandler={() =>
+              handleDownload(
+                image[index]?.compressedImageFile,
+                `compressed-${img.name}`
+              )
+            }
+          />
+        ))}
     </div>
   );
 }

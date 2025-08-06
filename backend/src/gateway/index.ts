@@ -48,6 +48,7 @@ const socketGateway = async (socket: Socket) => {
           JSON.stringify({
             imageId: uploadImage._id,
             image: buffer,
+            originalImageUrl: originalUrl,
             userId: userId,
             fileName: uploadImage.filename,
           })

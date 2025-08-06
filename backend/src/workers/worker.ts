@@ -35,7 +35,7 @@ export const consumeQueue = async (io: Server) => {
     let consumerStarted = false;
     if (consumerStarted) return;
     if (!msg) return;
-    const { imageId, image, fileName, userId } = JSON.parse(
+    const { imageId, image, fileName, userId, originalImageUrl } = JSON.parse(
       msg.content.toString()
     );
     const buffer = Buffer.from(image, "base64");
@@ -56,7 +56,9 @@ export const consumeQueue = async (io: Server) => {
       }
       io.to(userId).emit("notification", {
         message: "Image compressed successfully",
-        imageId: "123",
+        imageId: imageId,
+        fileName: fileName,
+        originalImageUrl: originalImageUrl,
         compressedImageUrl: outputPath,
       });
 
