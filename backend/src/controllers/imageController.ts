@@ -10,9 +10,19 @@ class ImageController {
     res: Response
   ): Promise<void> {
     try {
-      const downloadProcessedImagePath =
-        await imageService.downloadProcessedImage(req.params as { id: string });
-      return res.download(downloadProcessedImagePath);
+      const response = await imageService.downloadProcessedImage(
+        req.params as { url: string }
+      );
+      const contentType =
+        response.headers.get("content-type") || "application/octet-stream";
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=compressed-image.jpg"
+      );
+      res.setHeader("Content-Type", contentType);
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      res.send(buffer);
     } catch (error) {
       console.log(error);
       return sendResponse(

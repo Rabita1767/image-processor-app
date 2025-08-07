@@ -26,18 +26,30 @@ export default function Home() {
     reader.readAsDataURL(file);
   };
 
-  const handleDownload = (url: string, filename: string) => {
-    // Append fl_attachment transformation to force download
-    const downloadUrl = url.includes("?")
-      ? `${url}&fl_attachment`
-      : `${url}?fl_attachment`;
+  const handleDownload = async (url: string) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/image/download/${encodeURIComponent(
+          url
+        )}`
+      );
 
-    const link = document.createElement("a");
-    link.href = downloadUrl;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      if (!res.ok) throw new Error("Download failed");
+
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = "compressed.jpg"; // name of downloaded file
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(blobUrl); // cleanup
+    } catch (err) {
+      console.error("Error downloading:", err);
+    }
   };
 
   useEffect(() => {
@@ -127,10 +139,7 @@ export default function Home() {
               image[index]?.done ? "Download" : "Compression in Progress"
             }
             clickHandler={() =>
-              handleDownload(
-                image[index]?.compressedImageFile,
-                `compressed-${img.name}`
-              )
+              handleDownload(image[index]?.compressedImageFile)
             }
           />
         ))}

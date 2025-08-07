@@ -10,18 +10,17 @@ import mongoose from "mongoose";
 import { consumeQueue } from "../workers/worker";
 
 class ImageService {
-  public async downloadProcessedImage(params: { id: string }): Promise<string> {
+  public async downloadProcessedImage(params: { url: string }): Promise<any> {
     try {
-      const { id } = params;
-      const findImageById = await imageRepository.findImageById(id);
-      if (!findImageById) {
-        throw new Error(Messages.IMAGE_NOT_FOUND);
+      const { url } = params;
+      if (!url) {
+        throw new AppError(
+          Messages.INVALID_PARAMETERS,
+          HTTP_STATUS.BAD_REQUEST
+        );
       }
-      const filePath = findImageById.processedImageUrl;
-      if (!filePath || findImageById.status !== "done") {
-        throw new Error(Messages.IMAGE_NOT_COMPRESSED);
-      }
-      return filePath;
+      const response = await fetch(url);
+      return response;
     } catch (error) {
       console.log(error);
       throw new Error(Messages.ERROR_DOWNLOADING_IMAGE);
