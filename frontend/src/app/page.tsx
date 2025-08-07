@@ -5,6 +5,7 @@ import exampleImage from "@/app/assets/images/upload.png";
 import { useEffect, useState } from "react";
 import socket from "@/socket/socket";
 import { IImage } from "@/types/types";
+import Button from "@/components/atoms/button/button";
 export default function Home() {
   const [originalImage, setOriginalImage] = useState<File[]>([]);
   const [image, setImage] = useState<IImage[]>([]);
@@ -41,12 +42,12 @@ export default function Home() {
 
       const a = document.createElement("a");
       a.href = blobUrl;
-      a.download = "compressed.jpg"; // name of downloaded file
+      a.download = "compressed.jpg";
       document.body.appendChild(a);
       a.click();
       a.remove();
 
-      URL.revokeObjectURL(blobUrl); // cleanup
+      URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error("Error downloading:", err);
     }
@@ -118,7 +119,10 @@ export default function Home() {
   }, [image]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-full bg-white">
+    <div className="flex flex-col items-center justify-center w-full bg-white">
+      <div className="flex justify-end mt-10 w-full px-10">
+        <Button onClick={() => {}} type="submit" btnText="Register" />
+      </div>
       <DragAndDrop
         onInputChange={(value: string) => console.log("value", value)}
         onDrop={handleImageDrop}
