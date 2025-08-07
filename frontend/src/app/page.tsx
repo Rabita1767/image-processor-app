@@ -121,7 +121,13 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center w-full bg-white">
       <div className="flex justify-end mt-10 w-full px-10">
-        <Button onClick={() => {}} type="submit" btnText="Register" />
+        <Button
+          onClick={() => {
+            console.log("clicked");
+          }}
+          type="submit"
+          btnText="Register"
+        />
       </div>
       <DragAndDrop
         onInputChange={(value: string) => console.log("value", value)}

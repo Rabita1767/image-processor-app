@@ -1,0 +1,86 @@
+"use client";
+import Button from "@/components/atoms/button/button";
+import Input from "@/components/atoms/input/input";
+import React, { useEffect, useState } from "react";
+import { useSignupMutation } from "@/redux/services/api";
+
+const Registration = () => {
+  const [userName, setUserName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [signup, { isLoading, isSuccess, isError, error }] =
+    useSignupMutation();
+  const handleUserName = (value: string) => {
+    setUserName(value);
+  };
+  const handleEmail = (value: string) => {
+    setEmail(value);
+  };
+  const handlePassword = (value: string) => {
+    setPassword(value);
+  };
+  const handleRegistration = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("jdkdjkdjkld", { userName, email, password });
+    if (!userName || !email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
+    await signup({ userName, email, password });
+  };
+  useEffect(() => {
+    if (isSuccess) {
+      alert("Registration successful! Please login.");
+      setUserName("");
+      setEmail("");
+      setPassword("");
+    }
+  }, [isSuccess]);
+
+  return (
+    <div className="h-screen flex flex-col justify-center">
+      <h1 className="text-center text-2xl font-bold my-4">Registration</h1>
+      <form
+        onSubmit={handleRegistration}
+        className="flex flex-col max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-gray-300 rounded-lg"
+      >
+        <div>
+          <p>Username</p>
+          <Input
+            type="text"
+            onChange={handleUserName}
+            value={userName}
+            placeholder="Enter your username"
+            className="w-full mx-auto my-[8px]"
+            isRequired
+          />
+        </div>
+        <div>
+          <p>Email</p>
+          <Input
+            type="text"
+            onChange={handleEmail}
+            value={email}
+            placeholder="Enter your email"
+            className="w-full mx-auto my-[8px]"
+            isRequired
+          />
+        </div>
+        <div>
+          <p>Password</p>
+          <Input
+            type="password"
+            onChange={handlePassword}
+            value={password}
+            placeholder="Enter your password"
+            className="w-full mx-auto my-[8px]"
+            isRequired
+          />
+        </div>
+        <Button btnText="Signup" className="mt-[8px]" type="submit" />
+      </form>
+    </div>
+  );
+};
+
+export default Registration;
