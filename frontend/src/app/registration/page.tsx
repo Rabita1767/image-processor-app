@@ -24,7 +24,6 @@ const Registration = () => {
   };
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("jdkdjkdjkld", { userName, email, password });
     if (!userName || !email || !password) {
       alert("Please fill all fields");
       return;
@@ -42,7 +41,6 @@ const Registration = () => {
 
   useEffect(() => {
     if (!isError) return;
-    console.log("error", error);
     if ("data" in error) {
       toast.error(
         (error.data as { message?: string })?.message || "Registration failed"

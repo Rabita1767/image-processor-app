@@ -21,7 +21,6 @@ const Login = () => {
   };
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("jdkdjkdjkld", { email, password });
     if (!email || !password) {
       alert("Please fill all fields");
       return;
@@ -32,12 +31,10 @@ const Login = () => {
     if (!isSuccess) return;
     localStorage.setItem("accessToken", data?.data?.accessToken);
     router.push("/");
-    console.log("dataaaaa", data);
   }, [isSuccess]);
 
   useEffect(() => {
     if (!isError) return;
-    console.log("error", error);
     if ("data" in error) {
       toast.error(
         (error.data as { message?: string })?.message || "Login failed"
