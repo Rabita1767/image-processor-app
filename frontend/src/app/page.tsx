@@ -6,9 +6,13 @@ import { useEffect, useState } from "react";
 import socket from "@/socket/socket";
 import { IImage } from "@/types/types";
 import Button from "@/components/atoms/button/button";
+import { useRouter } from "next/navigation";
+
 export default function Home() {
+  const router = useRouter();
   const [originalImage, setOriginalImage] = useState<File[]>([]);
   const [image, setImage] = useState<IImage[]>([]);
+  const [hasToken, setHasToken] = useState<boolean>(false);
 
   const handleImageDrop = (file: File) => {
     if (!socket.connected) {
@@ -118,15 +122,32 @@ export default function Home() {
     };
   }, [image]);
 
+  useEffect(() => {
+    if (typeof window !== undefined) {
+      const token = localStorage.getItem("accessToken") || "";
+      if (token) {
+        setHasToken(true);
+      }
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center w-full bg-white">
       <div className="flex justify-end mt-10 w-full px-10">
         <Button
-          onClick={() => {
-            console.log("clicked");
-          }}
+          onClick={
+            hasToken
+              ? () => {
+                  localStorage.removeItem("accessToken");
+                  setHasToken(false);
+                  router.push("/");
+                }
+              : () => {
+                  router.push("/registration");
+                }
+          }
           type="submit"
-          btnText="Register"
+          btnText={hasToken ? "Logout" : "Signup"}
         />
       </div>
       <DragAndDrop

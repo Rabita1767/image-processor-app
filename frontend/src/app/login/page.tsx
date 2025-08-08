@@ -2,20 +2,17 @@
 import Button from "@/components/atoms/button/button";
 import Input from "@/components/atoms/input/input";
 import React, { useEffect, useState } from "react";
-import { useSignupMutation } from "@/redux/services/api";
+import { useLoginMutation } from "@/redux/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-const Registration = () => {
+const Login = () => {
   const router = useRouter();
-  const [userName, setUserName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [signup, { isLoading, isSuccess, isError, error }] =
-    useSignupMutation();
-  const handleUserName = (value: string) => {
-    setUserName(value);
-  };
+  const [login, { data, isLoading, isSuccess, isError, error }] =
+    useLoginMutation();
+
   const handleEmail = (value: string) => {
     setEmail(value);
   };
@@ -24,20 +21,18 @@ const Registration = () => {
   };
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("jdkdjkdjkld", { userName, email, password });
-    if (!userName || !email || !password) {
+    console.log("jdkdjkdjkld", { email, password });
+    if (!email || !password) {
       alert("Please fill all fields");
       return;
     }
-    await signup({ userName, email, password });
+    await login({ email, password });
   };
   useEffect(() => {
-    if (isSuccess) {
-      router.push("/login");
-      setUserName("");
-      setEmail("");
-      setPassword("");
-    }
+    if (!isSuccess) return;
+    localStorage.setItem("accessToken", data?.data?.accessToken);
+    router.push("/");
+    console.log("dataaaaa", data);
   }, [isSuccess]);
 
   useEffect(() => {
@@ -45,32 +40,20 @@ const Registration = () => {
     console.log("error", error);
     if ("data" in error) {
       toast.error(
-        (error.data as { message?: string })?.message || "Registration failed"
+        (error.data as { message?: string })?.message || "Login failed"
       );
     }
-    setUserName("");
     setEmail("");
     setPassword("");
   }, [isError, error]);
 
   return (
     <div className="h-screen flex flex-col justify-center">
-      <h1 className="text-center text-2xl font-bold my-4">Registration</h1>
+      <h1 className="text-center text-2xl font-bold my-4">Login</h1>
       <form
         onSubmit={handleRegistration}
         className="flex flex-col max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-gray-300 rounded-lg"
       >
-        <div>
-          <p>Username</p>
-          <Input
-            type="text"
-            onChange={handleUserName}
-            value={userName}
-            placeholder="Enter your username"
-            className="w-full mx-auto my-[8px]"
-            isRequired
-          />
-        </div>
         <div>
           <p>Email</p>
           <Input
@@ -93,16 +76,10 @@ const Registration = () => {
             isRequired
           />
         </div>
-        <Button btnText="Signup" className="mt-[8px]" type="submit" />
-        <p
-          className="text-center mt-[8px] cursor-pointer text-blue-500 hover:underline"
-          onClick={() => router.push("/login")}
-        >
-          Already have an account? Login
-        </p>
+        <Button btnText="Login" className="mt-[8px]" type="submit" />
       </form>
     </div>
   );
 };
 
-export default Registration;
+export default Login;

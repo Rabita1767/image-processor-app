@@ -45,7 +45,18 @@ export const api = createApi({
         body,
       }),
     }),
+    login: builder.mutation<any, { email: string; password: string }>({
+      query: (body) => ({
+        url: "/user/login",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useUploadAndCompressAsGuestMutation, useSignupMutation } = api;
+export const {
+  useUploadAndCompressAsGuestMutation,
+  useSignupMutation,
+  useLoginMutation,
+} = api;
