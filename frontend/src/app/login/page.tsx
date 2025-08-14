@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useLoginMutation } from "@/redux/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { getUserIdFromToken } from "@/utils/util";
 
 const Login = () => {
   const router = useRouter();
@@ -30,6 +31,10 @@ const Login = () => {
   useEffect(() => {
     if (!isSuccess) return;
     localStorage.setItem("accessToken", data?.data?.accessToken);
+    if (data?.data?.accessToken) {
+      const userId = getUserIdFromToken(data?.data?.accessToken);
+      localStorage.setItem("userId", userId || "");
+    }
     router.push("/");
   }, [isSuccess]);
 

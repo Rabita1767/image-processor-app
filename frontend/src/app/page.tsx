@@ -139,6 +139,7 @@ export default function Home() {
             hasToken
               ? () => {
                   localStorage.removeItem("accessToken");
+                  localStorage.removeItem("userId");
                   setHasToken(false);
                   router.push("/");
                 }
