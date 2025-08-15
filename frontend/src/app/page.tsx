@@ -13,6 +13,7 @@ export default function Home() {
   const [originalImage, setOriginalImage] = useState<File[]>([]);
   const [image, setImage] = useState<IImage[]>([]);
   const [hasToken, setHasToken] = useState<boolean>(false);
+  const [guestId, setGuestId] = useState<string>("");
 
   const handleImageDrop = (file: File) => {
     if (!socket.connected) {
@@ -131,6 +132,11 @@ export default function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    const guestId = localStorage.getItem("guestId") || "guest";
+    setGuestId(guestId);
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center w-full bg-white">
       <div className="flex justify-end mt-10 w-full px-10">
@@ -140,7 +146,11 @@ export default function Home() {
               ? () => {
                   localStorage.removeItem("accessToken");
                   localStorage.removeItem("userId");
+                  setImage([]);
+                  setOriginalImage([]);
                   setHasToken(false);
+                  socket.disconnect();
+                  socket.io.opts.query = { userId: guestId };
                   router.push("/");
                 }
               : () => {

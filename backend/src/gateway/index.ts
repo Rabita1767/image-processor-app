@@ -7,8 +7,6 @@ import uploadToCloudinaryFromBuffer from "../utils/cloudinary";
 
 const socketGateway = async (socket: Socket) => {
   const userId = socket.handshake.query.userId || "";
-  console.log("guuuuu", userId);
-  // socket.join(userId);
   const users: any = {};
 
   console.log("New client connected", socket.id);

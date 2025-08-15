@@ -6,6 +6,7 @@ import { useLoginMutation } from "@/redux/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { getUserIdFromToken } from "@/utils/util";
+import socket from "@/socket/socket";
 
 const Login = () => {
   const router = useRouter();
@@ -30,10 +31,15 @@ const Login = () => {
   };
   useEffect(() => {
     if (!isSuccess) return;
+    socket.disconnect();
+
     localStorage.setItem("accessToken", data?.data?.accessToken);
     if (data?.data?.accessToken) {
       const userId = getUserIdFromToken(data?.data?.accessToken);
+      socket.io.opts.query = { userId: userId };
+      socket.connect();
       localStorage.setItem("userId", userId || "");
+      // localStorage.removeItem("guestId");
     }
     router.push("/");
   }, [isSuccess]);
