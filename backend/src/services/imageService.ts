@@ -44,60 +44,6 @@ class ImageService {
     }
   }
 
-  //   public async uploadAndCompressAsGuest(
-  //     userId: String | undefined,
-  //     payload: IFile | undefined
-  //   ): Promise<any> {
-  //     try {
-  //       console.log("hhwjgdwjhqdjwhd", userId);
-  //       if (!payload) {
-  //         throw new AppError(Messages.FILE_NOT_FOUND, HTTP_STATUS.BAD_REQUEST);
-  //       }
-  //       const uploadImage = await imageRepository.uploadImageAsGuest(
-  //         userId,
-  //         payload
-  //       );
-  //       if (!uploadImage) {
-  //         throw new AppError(
-  //           Messages.IMAGE_NOT_UPLOADED,
-  //           HTTP_STATUS.BAD_REQUEST
-  //         );
-  //       }
-  //       // const userTokenData={
-  //       //     _id:uploadImage.user,
-  //       //     userName:"guest",
-  //       //     email:"guest@gmail.com",
-  //       // }
-  //       // const { accessToken, refreshToken } = await generateToken(userTokenData);
-  //       const channel = await getRabbitChannel();
-  //       const filePath = payload.path;
-  //       const imageBuffer = fs.readFileSync(filePath);
-  //       channel.sendToQueue(
-  //         "compress",
-  //         Buffer.from(
-  //           JSON.stringify({
-  //             imageId: uploadImage._id,
-  //             image: imageBuffer.toString("base64"),
-  //             userId: uploadImage.guestId,
-  //             fileName: uploadImage.filename,
-  //           })
-  //         )
-  //       );
-  //       console.log("Message sent to queue");
-  //       return {
-  //         guestId: uploadImage.guestId,
-  //         originalImage: payload.path,
-  //         // accessToken: accessToken,
-  //         // refreshToken: refreshToken,
-  //       };
-  //     } catch (error) {
-  //       console.log(error);
-  //       throw new AppError(
-  //         Messages.ERROR_UPLOADING_IMAGE,
-  //         HTTP_STATUS.BAD_REQUEST
-  //       );
-  //     }
-  //   }
   public async uploadAndCompress(
     userId: mongoose.Types.ObjectId | undefined,
     payload: IFile | undefined
@@ -139,6 +85,25 @@ class ImageService {
       throw new AppError(
         Messages.ERROR_UPLOADING_IMAGE,
         HTTP_STATUS.BAD_REQUEST
+      );
+    }
+  }
+
+  public async getUserImages(userId: string): Promise<IImage[]> {
+    try {
+      if (!userId) {
+        throw new AppError(Messages.INVALID_USER_ID, HTTP_STATUS.BAD_REQUEST);
+      }
+      const images = await imageRepository.findByUserId(userId);
+      if (!images) {
+        throw new AppError(Messages.IMAGE_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+      }
+      return images;
+    } catch (error) {
+      console.log(error);
+      throw new AppError(
+        Messages.ERROR_FETCHING_IMAGES,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
       );
     }
   }

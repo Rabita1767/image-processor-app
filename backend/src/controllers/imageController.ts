@@ -56,16 +56,23 @@ class ImageController {
     }
   }
 
-  // public async compressImageUpdatedAsGuest(req:CustomRequest,res:Response,next:NextFunction):Promise<void>{
-  //     try{
-  //         console.log("Compressing and uploading image as Guest");
-  //         const uploadAndCompress= await imageService.uploadAndCompressAsGuest(req.userId,req.file);
-  //         return sendResponse(res,HTTP_STATUS.CREATED,Messages.IMAGE_UPLOADED_AND_COMPRESSED_SUCCESSFULLY,uploadAndCompress);
-  //     }
-  //     catch(error){
-  //         console.log(error);
-  //         next(error);
-  //     }
-  // }
+  public async getUserImages(
+    req: CustomRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.userId;
+      const images = await imageService.getUserImages(userId as string);
+      return sendResponse(
+        res,
+        HTTP_STATUS.OK,
+        Messages.IMAGE_STATUS_FETCHED_SUCCESSFULLY,
+        images
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
 }
 export default new ImageController();

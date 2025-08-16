@@ -6,4 +6,5 @@ const router = express.Router();
 // router.post("/upload-and-compress",authMiddleware.auth,upload.single("image"),imageController.compressImageUpdatedAsGuest);
 router.get("/download/:url", imageController.downloadProcessedImage);
 router.get("/:id", authMiddleware.auth, imageController.getImageById);
+router.get("/user-images", authMiddleware.auth, imageController.getUserImages);
 export default router;

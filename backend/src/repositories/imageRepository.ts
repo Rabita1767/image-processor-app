@@ -55,5 +55,9 @@ class ImageRepository {
       { new: true }
     );
   }
+
+  public async findByUserId(userId: string): Promise<IImage[]> {
+    return await ImageModel.find({ user: userId });
+  }
 }
 export default new ImageRepository();
