@@ -1,14 +1,14 @@
 import { Socket } from "socket.io";
-import streamifier from "streamifier";
-import cloudinary from "../config/cloudinary";
 import imageRepository from "../repositories/imageRepository";
 import { getRabbitChannel } from "../config/rabbitMq";
 import uploadToCloudinaryFromBuffer from "../utils/cloudinary";
 
 const socketGateway = async (socket: Socket) => {
   const userId = socket.handshake.query.userId || "";
+  const token = socket.handshake.auth.token || "";
   const users: any = {};
-
+  console.log("tokkkeeeeeeen", token);
+  console.log("userId", userId);
   console.log("New client connected", socket.id);
 
   socket.on("authentication", async (data) => {
@@ -25,11 +25,20 @@ const socketGateway = async (socket: Socket) => {
         buffer,
         data.fileName || "uploaded_image"
       );
-      const uploadImage = await imageRepository.uploadImageAsGuest(
-        userId as string,
-        data?.fileName,
-        originalUrl
-      );
+      let uploadImage;
+      if (!token) {
+        uploadImage = await imageRepository.uploadImageAsGuest(
+          userId as string,
+          data?.fileName,
+          originalUrl
+        );
+      } else {
+        uploadImage = await imageRepository.uploadImageAsUser(
+          userId as string,
+          data?.fileName,
+          originalUrl
+        );
+      }
       if (!uploadImage) {
         console.error("Error saving image to database");
         return socket.emit("upload-error", { error: "Failed to save image" });

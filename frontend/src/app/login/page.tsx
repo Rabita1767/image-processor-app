@@ -37,6 +37,7 @@ const Login = () => {
     if (data?.data?.accessToken) {
       const userId = getUserIdFromToken(data?.data?.accessToken);
       socket.io.opts.query = { userId: userId };
+      socket.auth.token = data?.data?.accessToken;
       socket.connect();
       localStorage.setItem("userId", userId || "");
       // localStorage.removeItem("guestId");

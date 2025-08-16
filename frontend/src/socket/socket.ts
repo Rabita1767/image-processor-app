@@ -11,11 +11,20 @@ const getOrCreateGuestId = () => {
   }
 };
 
+const getToken = () => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("accessToken") || "";
+  }
+};
+
 const socket = io(process.env.NEXT_PUBLIC_BASE_URL, {
   autoConnect: false,
   transports: ["websocket"],
   query: {
     userId: getOrCreateGuestId() || "guest",
+  },
+  auth: {
+    token: getToken() || "",
   },
 });
 

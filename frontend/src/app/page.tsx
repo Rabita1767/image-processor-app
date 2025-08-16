@@ -151,6 +151,7 @@ export default function Home() {
                   setHasToken(false);
                   socket.disconnect();
                   socket.io.opts.query = { userId: guestId };
+                  socket.auth.token = "";
                   router.push("/");
                 }
               : () => {

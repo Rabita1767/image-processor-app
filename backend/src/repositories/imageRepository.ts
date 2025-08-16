@@ -14,6 +14,18 @@ class ImageRepository {
     });
   }
 
+  public async uploadImageAsUser(
+    userId: string | undefined,
+    fileName: any,
+    originalImageUrl: string
+  ): Promise<IImage> {
+    return await ImageModel.create({
+      user: userId,
+      filename: fileName,
+      originalImageUrl: originalImageUrl,
+    });
+  }
+
   public async uploadImage(
     userId: Types.ObjectId | undefined,
     payload: IFile
