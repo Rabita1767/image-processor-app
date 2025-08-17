@@ -11,92 +11,96 @@ export interface CustomRequest extends Request {
 }
 
 class AuthMiddleware {
-  // auth = async (req: CustomRequest, res: Response, next: NextFunction) => {
-  //   try {
-  //     let accessToken = req.headers.authorization;
-  //     let token = accessToken?.split(" ")[1];
-  //     if (!token) {
-  //       return next();
-  //     }
-  //     // Verify token
-  //     const decodedToken = jwt.verify(
-  //       token,
-  //       process.env.JWT_ACCESS_SECRET as string
-  //     ) as ITokenPayload;
-  //     if (!decodedToken) {
-  //       return sendResponse(
-  //         res,
-  //         HTTP_STATUS.UNAUTHORIZED,
-  //         Messages.UNAUTHORIZED
-  //       );
-  //     }
-  //     req.userId = decodedToken.id;
-  //     next();
-  //   } catch (error) {
-  //     console.log(error);
-  //     if (error instanceof jwt.JsonWebTokenError) {
-  //       return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Token Invalid");
-  //     }
-  //     if (error instanceof jwt.TokenExpiredError) {
-  //       return sendResponse(
-  //         res,
-  //         HTTP_STATUS.UNAUTHORIZED,
-  //         Messages.UNAUTHORIZED
-  //       );
-  //     }
-  //     return sendResponse(
-  //       res,
-  //       HTTP_STATUS.INTERNAL_SERVER_ERROR,
-  //       Messages.INTERNAL_SERVER_ERROR
-  //     );
-  //   }
-  // };
-
-  auth=(req:CustomRequest,res:Response,next:NextFunction)=>{
+  auth = async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
-      const accessToken=req.headers.authorization;
-      console.log("token",accessToken);
-      if(!accessToken)
-      {
-        req.userId=req.headers['x-guest-id'];
-        req.guestUser=true;
-        return next();
-      }
-      const token=accessToken.split(" ")[1];
-      if(!token)
-      {
-        return sendResponse(res,HTTP_STATUS.UNAUTHORIZED,Messages.UNAUTHORIZED);
+      let accessToken = req.headers.authorization;
+      let token = accessToken?.split(" ")[1];
+      if (!token) {
+        return sendResponse(
+          res,
+          HTTP_STATUS.UNAUTHORIZED,
+          Messages.UNAUTHORIZED
+        );
       }
       // Verify token
-      const decodedToken=jwt.verify(token,process.env.JWT_ACCESS_SECRET as string) as ITokenPayload;
-      if(!decodedToken)
-      {
-        return sendResponse(res,HTTP_STATUS.UNAUTHORIZED,Messages.UNAUTHORIZED);
+      const decodedToken = jwt.verify(
+        token,
+        process.env.JWT_ACCESS_SECRET as string
+      ) as ITokenPayload;
+      if (!decodedToken) {
+        return sendResponse(
+          res,
+          HTTP_STATUS.UNAUTHORIZED,
+          Messages.UNAUTHORIZED
+        );
       }
-      req.userId=decodedToken?.id;
-      req.guestUser=false;
-      console.log("User ID:", req.userId);
-      return next(); 
+      req.userId = decodedToken.id;
+      console.log("request userId", req.userId);
+      next();
     } catch (error) {
       console.log(error);
       if (error instanceof jwt.JsonWebTokenError) {
-          return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Token Invalid");
-        }
-        if (error instanceof jwt.TokenExpiredError) {
-          return sendResponse(
-            res,
-            HTTP_STATUS.UNAUTHORIZED,
-            Messages.UNAUTHORIZED
-          );
-        }
+        return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Token Invalid");
+      }
+      if (error instanceof jwt.TokenExpiredError) {
         return sendResponse(
           res,
-          HTTP_STATUS.INTERNAL_SERVER_ERROR,
-          Messages.INTERNAL_SERVER_ERROR
+          HTTP_STATUS.UNAUTHORIZED,
+          Messages.UNAUTHORIZED
         );
+      }
+      return sendResponse(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        Messages.INTERNAL_SERVER_ERROR
+      );
     }
+  };
 
-  }
+  // auth=(req:CustomRequest,res:Response,next:NextFunction)=>{
+  //   try {
+  //     const accessToken=req.headers.authorization;
+  //     console.log("token",accessToken);
+  //     if(!accessToken)
+  //     {
+  //       req.userId=req.headers['x-guest-id'];
+  //       req.guestUser=true;
+  //       return next();
+  //     }
+  //     const token=accessToken.split(" ")[1];
+  //     if(!token)
+  //     {
+  //       return sendResponse(res,HTTP_STATUS.UNAUTHORIZED,Messages.UNAUTHORIZED);
+  //     }
+  //     // Verify token
+  //     const decodedToken=jwt.verify(token,process.env.JWT_ACCESS_SECRET as string) as ITokenPayload;
+  //     if(!decodedToken)
+  //     {
+  //       return sendResponse(res,HTTP_STATUS.UNAUTHORIZED,Messages.UNAUTHORIZED);
+  //     }
+  //     req.userId=decodedToken?.id;
+  //     req.guestUser=false;
+  //     console.log("User ID:", req.userId);
+  //     return next();
+  //   } catch (error) {
+  //     console.log(error);
+  //     if (error instanceof jwt.JsonWebTokenError) {
+  //         return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Token Invalid");
+  //       }
+  //       if (error instanceof jwt.TokenExpiredError) {
+  //         return sendResponse(
+  //           res,
+  //           HTTP_STATUS.UNAUTHORIZED,
+  //           Messages.UNAUTHORIZED
+  //         );
+  //       }
+  //       return sendResponse(
+  //         res,
+  //         HTTP_STATUS.INTERNAL_SERVER_ERROR,
+  //         Messages.INTERNAL_SERVER_ERROR
+  //       );
+  //   }
 
+  // }
 }
 export default new AuthMiddleware();

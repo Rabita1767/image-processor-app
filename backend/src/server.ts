@@ -28,6 +28,11 @@ io.on("connection", socketGateway);
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  console.log("Incoming request:", req.method, req.path);
+  next();
+});
+
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/image", imageRoute);
 app.use(errorHandler);

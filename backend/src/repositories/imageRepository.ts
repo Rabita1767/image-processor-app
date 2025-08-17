@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { Mongoose, Types } from "mongoose";
 import ImageModel from "../models/imageModel";
 import { IFile, IImage } from "../types";
 class ImageRepository {
@@ -27,7 +27,7 @@ class ImageRepository {
   }
 
   public async uploadImage(
-    userId: Types.ObjectId | undefined,
+    userId: mongoose.Types.ObjectId | undefined,
     payload: IFile
   ): Promise<IImage> {
     console.log("userrrrr", userId);
@@ -56,7 +56,9 @@ class ImageRepository {
     );
   }
 
-  public async findByUserId(userId: string): Promise<IImage[]> {
+  public async findByUserId(
+    userId: mongoose.Types.ObjectId
+  ): Promise<IImage[]> {
     return await ImageModel.find({ user: userId });
   }
 }

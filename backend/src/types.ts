@@ -1,4 +1,8 @@
-import mongoose, { Document, Types } from "mongoose";
+import mongoose, {
+  Document,
+  MongooseDistinctDocumentMiddleware,
+  Types,
+} from "mongoose";
 import { Request } from "express";
 export interface IUser extends Document {
   userName: string;
@@ -44,7 +48,7 @@ export interface ILoginResponse {
 }
 
 export interface CustomRequest extends Request {
-  userId?: String;
+  userId?: mongoose.Types.ObjectId;
 }
 export interface IFile {
   fieldname: string;

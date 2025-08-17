@@ -17,13 +17,12 @@ export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
     prepareHeaders: (headers, { getState }) => {
-      // const token=getState().auth.accessToken;
-      // if(token)
-      // {
-      //   headers.set("Authorization",`Bearer ${token}`);
-      // }
-      headers.set("x-guest-id", getOrCreateGuestId() || "guest");
-      headers.set("is-guest", "true");
+      const token = localStorage.getItem("accessToken") || "";
+
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
     },
   }),
 
@@ -52,6 +51,12 @@ export const api = createApi({
         body,
       }),
     }),
+    getUserImages: builder.query<any, void>({
+      query: () => ({
+        url: "/image/get/userImages",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -59,4 +64,5 @@ export const {
   useUploadAndCompressAsGuestMutation,
   useSignupMutation,
   useLoginMutation,
+  useGetUserImagesQuery,
 } = api;

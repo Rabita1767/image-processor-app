@@ -89,7 +89,9 @@ class ImageService {
     }
   }
 
-  public async getUserImages(userId: string): Promise<IImage[]> {
+  public async getUserImages(
+    userId: mongoose.Types.ObjectId | undefined
+  ): Promise<IImage[]> {
     try {
       if (!userId) {
         throw new AppError(Messages.INVALID_USER_ID, HTTP_STATUS.BAD_REQUEST);

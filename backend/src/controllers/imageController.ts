@@ -62,8 +62,9 @@ class ImageController {
     next: NextFunction
   ): Promise<void> {
     try {
+      console.log("hereeeee");
       const userId = req.userId;
-      const images = await imageService.getUserImages(userId as string);
+      const images = await imageService.getUserImages(userId);
       return sendResponse(
         res,
         HTTP_STATUS.OK,
