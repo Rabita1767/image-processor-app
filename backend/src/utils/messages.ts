@@ -28,4 +28,8 @@ export const Messages = {
     "Image uploaded and compressed successfully",
   INVALID_USER_ID: "Invalid user ID",
   ERROR_FETCHING_IMAGES: "Error fetching images",
+  TOKEN_GENERATED: "Token generated successfully",
+  TOKEN_NOT_UPDATED: "Token not updated",
+  TOKEN_EXPIRED_OR_INVALID: "Token expired or invalid",
+  SERVER_ERROR: "Server error occurred",
 };

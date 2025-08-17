@@ -6,6 +6,7 @@ import Redis from "ioredis";
 import { createAdapter } from "@socket.io/redis-adapter";
 import userRoute from "./routes/userRoute";
 import imageRoute from "./routes/imageRoute";
+import tokenRoute from "./routes/tokenRoute";
 import { errorHandler } from "./middlewares/errorMiddleware";
 import socketGateway from "./gateway/index";
 
@@ -35,6 +36,7 @@ app.use((req, res, next) => {
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/image", imageRoute);
+app.use("/api/v1/token", tokenRoute);
 app.use(errorHandler);
 
 export { server, io };
