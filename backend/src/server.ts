@@ -2,6 +2,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import Redis from "ioredis";
 import { createAdapter } from "@socket.io/redis-adapter";
 import userRoute from "./routes/userRoute";
@@ -26,9 +27,16 @@ io.adapter(createAdapter(pubClient, subClient));
 
 io.on("connection", socketGateway);
 
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use((req, res, next) => {
   console.log("Incoming request:", req.method, req.path);
   next();

@@ -14,6 +14,7 @@ class TokenService {
     refreshToken: string;
   }): Promise<string> {
     const { refreshToken: currentRefreshToken } = payload;
+    console.log("hellloo", currentRefreshToken);
     if (!currentRefreshToken) {
       throw new AppError(Messages.BAD_REQUEST, HTTP_STATUS.BAD_REQUEST);
     }

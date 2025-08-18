@@ -24,7 +24,7 @@ class UserService {
   public async login(payload: IloginPayload): Promise<ILoginResponse> {
     const findUser = await userRepository.findUserByEmail(payload.email);
     if (!findUser) {
-      throw new AppError(Messages.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+      throw new AppError(Messages.PLEASE_SIGN_UP, HTTP_STATUS.NOT_FOUND);
     }
     const isPasswordMatched = await bcrypt.compare(
       payload.password,
@@ -40,7 +40,5 @@ class UserService {
       refreshToken,
     };
   }
-
-  
 }
 export default new UserService();

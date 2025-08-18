@@ -1,32 +1,11 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithReauth } from "./baseQuery";
 
-const getOrCreateGuestId = () => {
-  if (typeof window !== "undefined") {
-    let guestId = localStorage.getItem("guestId");
-    if (!guestId) {
-      guestId = crypto.randomUUID();
-      localStorage.setItem("guestId", guestId);
-    }
-    return guestId;
-  }
-};
-
-console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
 export const api = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const token = localStorage.getItem("accessToken") || "";
-
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
-
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
+    // Guest upload & compress
     uploadAndCompressAsGuest: builder.mutation<any, FormData>({
       query: (formData) => ({
         url: "/image/upload-and-compress",
@@ -34,6 +13,8 @@ export const api = createApi({
         body: formData,
       }),
     }),
+
+    // Signup
     signup: builder.mutation<
       any,
       { userName: string; email: string; password: string }
@@ -44,13 +25,24 @@ export const api = createApi({
         body,
       }),
     }),
+
+    // Login
     login: builder.mutation<any, { email: string; password: string }>({
       query: (body) => ({
         url: "/user/login",
         method: "POST",
         body,
       }),
+      // Optionally transform response to store accessToken only
+      transformResponse: (response: any) => {
+        if (response.accessToken) {
+          localStorage.setItem("accessToken", response.accessToken);
+        }
+        return response;
+      },
     }),
+
+    // Get user images (protected endpoint)
     getUserImages: builder.query<any, void>({
       query: () => ({
         url: "/image/get/userImages",

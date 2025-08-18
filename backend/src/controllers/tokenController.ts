@@ -10,7 +10,7 @@ class TokenController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const accessToken = await tokenService.getAccessToken(req.body);
+      const accessToken = await tokenService.getAccessToken(req.cookies);
       return sendResponse(
         res,
         HTTP_STATUS.OK,

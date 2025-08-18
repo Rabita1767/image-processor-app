@@ -26,6 +26,14 @@ class UserController {
   ): Promise<void> {
     try {
       const login = await userService.login(req.body);
+      res.cookie("refreshToken", login.refreshToken, {
+        httpOnly: true,
+        secure: false, // false for localhost; true for production (HTTPS)
+        sameSite: "lax", // allows cookies on same site or top-level navigation
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: "/", // ensure cookie is sent to all routes
+      });
+
       return sendResponse(res, HTTP_STATUS.OK, Messages.CREATED, login);
     } catch (error) {
       next(error);

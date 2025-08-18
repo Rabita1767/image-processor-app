@@ -107,6 +107,7 @@ export const verifyAndRotateRefreshToken = async (
     if (!updateToken) {
       throw new AppError(Messages.TOKEN_NOT_UPDATED, HTTP_STATUS.BAD_REQUEST);
     }
+    console.log("newwwwwwwww", refreshToken);
     return accessToken;
   } catch (error) {
     console.error(Messages.ERROR_GENERATING_TOKEN, error);

@@ -32,4 +32,5 @@ export const Messages = {
   TOKEN_NOT_UPDATED: "Token not updated",
   TOKEN_EXPIRED_OR_INVALID: "Token expired or invalid",
   SERVER_ERROR: "Server error occurred",
+  PLEASE_SIGN_UP: "Please sign up first",
 };
