@@ -10,6 +10,8 @@ import imageRoute from "./routes/imageRoute";
 import tokenRoute from "./routes/tokenRoute";
 import { errorHandler } from "./middlewares/errorMiddleware";
 import socketGateway from "./gateway/index";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
@@ -29,7 +31,7 @@ io.on("connection", socketGateway);
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
     credentials: true,
   })
 );
