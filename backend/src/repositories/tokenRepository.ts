@@ -10,7 +10,7 @@ class TokenRepository {
   ) {
     return await tokenModel.findOneAndUpdate(
       { userId: userId },
-      { refreshToken: refreshToken },
+      { refreshToken: refreshToken, createdAt: new Date() },
       { new: true, upsert: true }
     );
   }

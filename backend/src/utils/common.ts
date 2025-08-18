@@ -4,6 +4,10 @@ import dotenv from "dotenv";
 import TokenModel from "../models/tokenModel";
 import { ApiResponse, IToken, IUser } from "../types";
 import { Messages } from "./messages";
+import AppError from "./AppError";
+import HTTP_STATUS from "../constants/statusCode";
+import tokenRepository from "../repositories/tokenRepository";
+import { Types } from "mongoose";
 dotenv.config();
 
 export const sendResponse = (
@@ -36,7 +40,7 @@ export const sendResponse = (
 
 export const generateToken = async (tokenData: any): Promise<IToken> => {
   try {
-    const accessToken =  jwt.sign(
+    const accessToken = jwt.sign(
       {
         id: tokenData._id,
         name: tokenData.userName ?? "guest",
@@ -45,7 +49,7 @@ export const generateToken = async (tokenData: any): Promise<IToken> => {
       process.env.JWT_ACCESS_SECRET as string,
       { expiresIn: "1h" }
     );
-    const refreshToken =  jwt.sign(
+    const refreshToken = jwt.sign(
       {
         id: tokenData._id,
         name: tokenData.userName ?? "guest",
@@ -71,5 +75,44 @@ export const generateToken = async (tokenData: any): Promise<IToken> => {
   } catch (error) {
     console.error(Messages.ERROR_GENERATING_TOKEN, error);
     throw new Error(Messages.TOKEN_GENERATION_FAILED);
+  }
+};
+
+export const verifyAndRotateRefreshToken = async (
+  tokenData: IUser
+): Promise<string> => {
+  try {
+    const accessToken = jwt.sign(
+      {
+        id: tokenData._id,
+        name: tokenData?.userName,
+        email: tokenData?.email,
+      },
+      process.env.JWT_ACCESS_SECRET as string,
+      { expiresIn: "1h" }
+    );
+    const refreshToken = jwt.sign(
+      {
+        id: tokenData._id,
+        name: tokenData?.userName,
+        email: tokenData?.email,
+      },
+      process.env.JWT_ACCESS_SECRET as string,
+      { expiresIn: "7d" }
+    );
+    const updateToken = await tokenRepository.updateToken(
+      tokenData._id as Types.ObjectId,
+      refreshToken
+    );
+    if (!updateToken) {
+      throw new AppError(Messages.TOKEN_NOT_UPDATED, HTTP_STATUS.BAD_REQUEST);
+    }
+    return accessToken;
+  } catch (error) {
+    console.error(Messages.ERROR_GENERATING_TOKEN, error);
+    throw new AppError(
+      Messages.TOKEN_GENERATION_FAILED,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
