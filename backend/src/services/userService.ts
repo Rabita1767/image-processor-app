@@ -8,13 +8,20 @@ import HTTP_STATUS from "../constants/statusCode";
 
 class UserService {
   public async signup(userData: IUser): Promise<IUser> {
-    const { password } = userData;
+    const { userName, email, password } = userData;
+    const findUser = await userRepository.findUserByEmail(email);
+    if( findUser ) {
+      throw new AppError(Messages.USER_ALREADY_EXISTS, HTTP_STATUS.BAD_REQUEST);
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     if (!hashedPassword) {
       throw new AppError(Messages.BAD_REQUEST, HTTP_STATUS.BAD_REQUEST);
     }
-    userData.password = hashedPassword;
-    const user = await userRepository.createUser(userData);
+    const user = await userRepository.createUser(
+      userName,
+      email,
+      hashedPassword
+    );
     if (!user) {
       throw new AppError(Messages.USER_NOT_CREATED, HTTP_STATUS.BAD_REQUEST);
     }

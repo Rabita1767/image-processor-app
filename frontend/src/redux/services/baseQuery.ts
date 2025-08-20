@@ -6,7 +6,7 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 
-const baseQuery = fetchBaseQuery({
+export const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL,
   prepareHeaders: (headers) => {
     const token = localStorage.getItem("accessToken");

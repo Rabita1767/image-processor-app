@@ -1,11 +1,14 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithReauth } from "./baseQuery";
+import { baseQuery, baseQueryWithReauth } from "./baseQuery"; // no reauth
 
 export const api = createApi({
   reducerPath: "api",
-  baseQuery: baseQueryWithReauth,
+  baseQuery: async (args, api, extraOptions) => {
+    // default to baseQueryWithReauth unless overridden in endpoint
+    return baseQueryWithReauth(args, api, extraOptions);
+  },
   endpoints: (builder) => ({
-    // Guest upload & compress
+    // Guest upload & compress (reauth required)
     uploadAndCompressAsGuest: builder.mutation<any, FormData>({
       query: (formData) => ({
         url: "/image/upload-and-compress",
@@ -14,35 +17,43 @@ export const api = createApi({
       }),
     }),
 
-    // Signup
+    // Signup (no reauth)
     signup: builder.mutation<
       any,
       { userName: string; email: string; password: string }
     >({
-      query: (body) => ({
-        url: "/user/signup",
-        method: "POST",
-        body,
-      }),
+      queryFn: async (body, api, extraOptions) =>
+        baseQuery(
+          {
+            url: "/user/signup",
+            method: "POST",
+            body,
+          },
+          api,
+          extraOptions
+        ),
     }),
 
-    // Login
+    // Login (no reauth)
     login: builder.mutation<any, { email: string; password: string }>({
-      query: (body) => ({
-        url: "/user/login",
-        method: "POST",
-        body,
-      }),
-      // Optionally transform response to store accessToken only
-      transformResponse: (response: any) => {
-        if (response.accessToken) {
-          localStorage.setItem("accessToken", response.accessToken);
+      queryFn: async (body, api, extraOptions) => {
+        const response = await baseQuery(
+          {
+            url: "/user/login",
+            method: "POST",
+            body,
+          },
+          api,
+          extraOptions
+        );
+        if (response.data?.accessToken) {
+          localStorage.setItem("accessToken", response.data.accessToken);
         }
         return response;
       },
     }),
 
-    // Get user images (protected endpoint)
+    // Get user images (reauth required)
     getUserImages: builder.query<any, void>({
       query: () => ({
         url: "/image/get/userImages",

@@ -1,11 +1,15 @@
 import UserModel from "../models/userModel";
 import { IUser } from "../types";
 class UserRepository {
-  public async createUser(userData: IUser): Promise<IUser> {
+  public async createUser(
+    userName: string,
+    email: string,
+    password: string
+  ): Promise<IUser> {
     const user = new UserModel({
-      userName: userData.userName,
-      email: userData.email,
-      password: userData.password,
+      userName: userName,
+      email: email,
+      password: password,
     });
     await user.save();
     return user;
