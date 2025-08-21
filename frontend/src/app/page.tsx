@@ -7,6 +7,7 @@ import socket from "@/socket/socket";
 import { IImage } from "@/types/types";
 import Button from "@/components/atoms/button/button";
 import { useRouter } from "next/navigation";
+import Header from "@/components/molecules/header/header";
 
 export default function Home() {
   const router = useRouter();
@@ -56,6 +57,18 @@ export default function Home() {
     } catch (err) {
       console.error("Error downloading:", err);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+    setImage([]);
+    setOriginalImage([]);
+    setHasToken(false);
+    socket.disconnect();
+    socket.io.opts.query = { userId: guestId };
+    socket.auth.token = "";
+    router.push("/");
   };
 
   useEffect(() => {
@@ -138,39 +151,9 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full bg-white">
-      <div className="flex justify-end mt-10 w-full px-10 gap-4">
-        {hasToken && (
-          <Button
-            onClick={() => {
-              router.push("/user-images");
-            }}
-            type="submit"
-            btnText="Images"
-          />
-        )}
-        <Button
-          onClick={
-            hasToken
-              ? () => {
-                  localStorage.removeItem("accessToken");
-                  localStorage.removeItem("userId");
-                  setImage([]);
-                  setOriginalImage([]);
-                  setHasToken(false);
-                  socket.disconnect();
-                  socket.io.opts.query = { userId: guestId };
-                  socket.auth.token = "";
-                  router.push("/");
-                }
-              : () => {
-                  router.push("/registration");
-                }
-          }
-          type="submit"
-          btnText={hasToken ? "Logout" : "Signup"}
-        />
-      </div>
+    <div className="flex flex-col items-center justify-center w-full bg-white p-8">
+      <Header logoutHandler={handleLogout} hasToken={hasToken} />
+
       <DragAndDrop
         onInputChange={(value: string) => console.log("value", value)}
         onDrop={handleImageDrop}
