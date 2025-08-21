@@ -32,7 +32,7 @@ const Header: React.FC<IHeaderProps> = ({ hasToken, logoutHandler }) => {
           }
           type="submit"
           btnText={hasToken ? "Logout" : "Login"}
-          className="bg-transparent text-[black] hover:rounded-[24px] hover:text-white"
+          className="bg-transparent text-primary hover:rounded-[24px] hover:text-white"
         />
         <Button
           onClick={() => {

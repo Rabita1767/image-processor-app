@@ -5,7 +5,6 @@ import exampleImage from "@/app/assets/images/upload.png";
 import { useEffect, useState } from "react";
 import socket from "@/socket/socket";
 import { IImage } from "@/types/types";
-import Button from "@/components/atoms/button/button";
 import { useRouter } from "next/navigation";
 import Header from "@/components/molecules/header/header";
 
@@ -15,6 +14,7 @@ export default function Home() {
   const [image, setImage] = useState<IImage[]>([]);
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [guestId, setGuestId] = useState<string>("");
+  const [isCompressionDone, setIsCompressionDone] = useState<boolean>(false);
 
   const handleImageDrop = (file: File) => {
     if (!socket.connected) {
@@ -73,6 +73,7 @@ export default function Home() {
 
   useEffect(() => {
     socket.on("notification", (data) => {
+      setIsCompressionDone(true);
       console.log("Got notification:", data);
       setImage((prev) => [
         ...prev,
@@ -151,13 +152,17 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full bg-white p-8">
+    <div className="flex flex-col items-center justify-center w-full bg-white p-12">
       <Header logoutHandler={handleLogout} hasToken={hasToken} />
+      <div className="w-full flex flex-row justify-between">
+        <div className="flex-flex-col gap-4">hello</div>
+        <DragAndDrop
+          onInputChange={(value: string) => console.log("value", value)}
+          onDrop={handleImageDrop}
+          isCompressionDone={isCompressionDone}
+        />
+      </div>
 
-      <DragAndDrop
-        onInputChange={(value: string) => console.log("value", value)}
-        onDrop={handleImageDrop}
-      />
       {originalImage &&
         originalImage.length > 0 &&
         originalImage.map((img: any, index: number) => (

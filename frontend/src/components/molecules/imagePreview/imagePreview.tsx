@@ -20,7 +20,7 @@ const ImagePreview: React.FC<IImagePreview> = ({
   clickHandler,
 }) => {
   return (
-    <div className="flex flex-col w-[80%] mx-auto border-2 border-gray-300 p-4 rounded-lg items-center gap-4">
+    <div className="flex flex-col w-[80%] mx-auto border-1 border-lightBlue p-4 rounded-lg items-center gap-4">
       <div className="flex flex-row gap-2 justify-between w-full">
         <div>
           <Image
@@ -36,6 +36,7 @@ const ImagePreview: React.FC<IImagePreview> = ({
             onClick={clickHandler ? clickHandler : () => {}}
             type="submit"
             btnText={btnText}
+            className="bg-primary rounded-[24px] text-white"
           />
         </div>
       </div>

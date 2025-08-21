@@ -4,12 +4,14 @@
   --background: #ffffff;
   --foreground: #171717;
   --primary: #0c72bc;
+  --lightBlue: #85cae8;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-lightBlue: var(--lightBlue);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
