@@ -47,20 +47,38 @@ const socketGateway = async (socket: Socket) => {
       socket.emit("upload-success", {
         message: "Image uploaded successfully",
         imageUrl: originalUrl,
+        uploadedImgId: uploadImage._id,
       });
-      const channel = await getRabbitChannel();
-      channel.sendToQueue(
-        "compress",
-        Buffer.from(
-          JSON.stringify({
-            imageId: uploadImage._id,
-            image: buffer,
-            originalImageUrl: originalUrl,
-            userId: userId,
-            fileName: uploadImage.filename,
-          })
-        )
-      );
+      // const channel = await getRabbitChannel();
+      // channel.sendToQueue(
+      //   "compress",
+      //   Buffer.from(
+      //     JSON.stringify({
+      //       imageId: uploadImage._id,
+      //       image: buffer,
+      //       originalImageUrl: originalUrl,
+      //       userId: userId,
+      //       fileName: uploadImage.filename,
+      //     })
+      //   )
+      // );
+      // socket.on("new-test", async (data) => {
+      //   console.log("gotcha", data);
+      //   if (!data) return;
+      //   const channel = await getRabbitChannel();
+      //   channel.sendToQueue(
+      //     "compress",
+      //     Buffer.from(
+      //       JSON.stringify({
+      //         imageId: uploadImage._id,
+      //         image: buffer,
+      //         originalImageUrl: originalUrl,
+      //         userId: userId,
+      //         fileName: uploadImage.filename,
+      //       })
+      //     )
+      //   );
+      // });
     } catch (err) {
       console.error("Error uploading image:", err);
       socket.emit("upload-error", { error: err.message });
@@ -70,6 +88,33 @@ const socketGateway = async (socket: Socket) => {
   socket.emit("hello", {
     message: "Hello from the server!",
     socketId: socket.id,
+  });
+  socket.on("new-test", async (data) => {
+    const findUploadedImage = await imageRepository.findImageById(
+      data?.uploadedFileId
+    );
+    if (!findUploadedImage) {
+      return socket.emit("upload-error", { error: "Failed to find image" });
+    }
+    const base64Data = data?.base64Image.replace(
+      /^data:image\/\w+;base64,/,
+      ""
+    );
+    const buffer = Buffer.from(base64Data, "base64");
+    const channel = await getRabbitChannel();
+    channel.sendToQueue(
+      "compress",
+      Buffer.from(
+        JSON.stringify({
+          imageId: findUploadedImage._id,
+          image: buffer,
+          originalImageUrl: data.originalUrl,
+          userId: userId,
+          fileName: findUploadedImage.filename,
+          compressionValue: data.compressionValue,
+        })
+      )
+    );
   });
 
   socket.on("disconnect", () => {

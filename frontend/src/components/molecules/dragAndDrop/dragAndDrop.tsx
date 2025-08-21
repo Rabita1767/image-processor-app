@@ -2,16 +2,21 @@
 import Input from "@/components/atoms/input/input";
 import { useEffect, useState } from "react";
 import ButtonGroup from "../buttonGroup/buttonGroup";
-import { Upload } from "lucide-react";
+import { Upload, Check, CheckCircle } from "lucide-react";
+import socket from "@/socket/socket";
 interface IDragAndDrop {
   onInputChange: (value: string) => void;
   onDrop: (file: File) => void;
   isCompressionDone: boolean;
+  isUploadComplete: boolean;
+  setIsUploadComplete: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const DragAndDrop: React.FC<IDragAndDrop> = ({
   onInputChange,
   onDrop,
   isCompressionDone,
+  isUploadComplete,
+  setIsUploadComplete,
 }) => {
   const [isDrop, setIsDrop] = useState<boolean>(false);
 
@@ -35,8 +40,9 @@ const DragAndDrop: React.FC<IDragAndDrop> = ({
   useEffect(() => {
     setIsDrop(false);
   }, [isCompressionDone]);
+
   return (
-    <div className="flex flex-col gap-4 w-[50%] my-10 p-4">
+    <div className="flex flex-col gap-4 w-[50%] p-4">
       <p className="text-primary text-[24px] font-bold">Compress Your Images</p>
       <ButtonGroup />
       <p className="text-primary text-[16px]">Upload Image</p>
@@ -53,11 +59,15 @@ const DragAndDrop: React.FC<IDragAndDrop> = ({
           onChange={onInputChange}
           value=""
         />
-        <Upload
-          className={`w-8 h-8 text-primary transform transition-transform duration-200 ${
-            isDrop ? "scale-150" : ""
-          }`}
-        />
+        {isUploadComplete ? (
+          <CheckCircle className="w-8 h-8 text-primary" />
+        ) : (
+          <Upload
+            className={`w-8 h-8 text-primary transform transition-transform duration-200 ${
+              isDrop ? "scale-150" : ""
+            }`}
+          />
+        )}
         <div className="p-4 bg-white">
           <p className="text-center text-black text-[16px]">
             Drag and drop an image here, or click to select a file.

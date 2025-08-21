@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useSignupMutation } from "@/redux/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import Header from "@/components/molecules/header/header";
 
 const Registration = () => {
   const router = useRouter();
@@ -52,53 +53,60 @@ const Registration = () => {
   }, [isError, error]);
 
   return (
-    <div className="h-screen flex flex-col justify-center">
-      <h1 className="text-center text-2xl font-bold my-4">Registration</h1>
-      <form
-        onSubmit={handleRegistration}
-        className="flex flex-col max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-gray-300 rounded-lg"
-      >
-        <div>
-          <p>Username</p>
-          <Input
-            type="text"
-            onChange={handleUserName}
-            value={userName}
-            placeholder="Enter your username"
-            className="w-full mx-auto my-[8px]"
-            isRequired
-          />
-        </div>
-        <div>
-          <p>Email</p>
-          <Input
-            type="text"
-            onChange={handleEmail}
-            value={email}
-            placeholder="Enter your email"
-            className="w-full mx-auto my-[8px]"
-            isRequired
-          />
-        </div>
-        <div>
-          <p>Password</p>
-          <Input
-            type="password"
-            onChange={handlePassword}
-            value={password}
-            placeholder="Enter your password"
-            className="w-full mx-auto my-[8px]"
-            isRequired
-          />
-        </div>
-        <Button btnText="Signup" className="mt-[8px]" type="submit" />
-        <p
-          className="text-center mt-[8px] cursor-pointer text-blue-500 hover:underline"
-          onClick={() => router.push("/login")}
+    <div className="h-screen flex flex-col p-8 gap-10">
+      <Header />
+      <div>
+        <h1 className="text-center text-2xl font-bold my-4">Registration</h1>
+        <form
+          onSubmit={handleRegistration}
+          className="flex flex-col max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-gray-300 rounded-lg"
         >
-          Already have an account? Login
-        </p>
-      </form>
+          <div>
+            <p>Username</p>
+            <Input
+              type="text"
+              onChange={handleUserName}
+              value={userName}
+              placeholder="Enter your username"
+              className="w-full mx-auto my-[8px]"
+              isRequired
+            />
+          </div>
+          <div>
+            <p>Email</p>
+            <Input
+              type="text"
+              onChange={handleEmail}
+              value={email}
+              placeholder="Enter your email"
+              className="w-full mx-auto my-[8px]"
+              isRequired
+            />
+          </div>
+          <div>
+            <p>Password</p>
+            <Input
+              type="password"
+              onChange={handlePassword}
+              value={password}
+              placeholder="Enter your password"
+              className="w-full mx-auto my-[8px]"
+              isRequired
+            />
+          </div>
+          <Button
+            btnText="Signup"
+            className="mt-[8px] bg-primary text-white text-center rounded-[24px]"
+            type="submit"
+          />
+          <p
+            className="text-center mt-[8px] cursor-pointer text-blue-500 hover:underline"
+            onClick={() => router.push("/login")}
+          >
+            Already have an account? Login
+          </p>
+        </form>
+      </div>
     </div>
   );
 };

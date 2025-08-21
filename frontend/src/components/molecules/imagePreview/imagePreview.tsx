@@ -6,7 +6,7 @@ import { File } from "buffer";
 
 interface IImagePreview {
   imgSrc: string | StaticImageData;
-  imgTitle: string;
+
   progress?: number;
   btnText?: string;
   clickHandler?: () => void;
@@ -14,23 +14,22 @@ interface IImagePreview {
 
 const ImagePreview: React.FC<IImagePreview> = ({
   imgSrc,
-  imgTitle,
+
   progress,
   btnText,
   clickHandler,
 }) => {
   return (
-    <div className="flex flex-col w-[80%] mx-auto border-1 border-lightBlue p-4 rounded-lg items-center gap-4">
+    <div className="flex flex-col w-full h-[170px] mx-auto border border-lightBlue p-4 rounded-lg items-center gap-4 mb-4">
       <div className="flex flex-row gap-2 justify-between w-full">
-        <div>
+        <div className="w-[100px] h-[100px] relative">
           <Image
             src={imgSrc || "https://via.placeholder.com/100"}
             alt="compressed-image"
-            width={100}
-            height={100}
+            fill
+            className="object-contain p-[8px] rounded-[8px]"
           />
         </div>
-        <div>{imgTitle}</div>
         <div>
           <Button
             onClick={clickHandler ? clickHandler : () => {}}

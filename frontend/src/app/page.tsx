@@ -7,6 +7,12 @@ import socket from "@/socket/socket";
 import { IImage } from "@/types/types";
 import { useRouter } from "next/navigation";
 import Header from "@/components/molecules/header/header";
+import LeftHeader from "@/components/leftHeader/leftHeader";
+import Button from "@/components/atoms/button/button";
+import { ArrowRightIcon } from "lucide-react";
+import { toast } from "react-toastify";
+import CompressionSlider from "@/components/molecules/compressionSlider/compressionSlider";
+import Loader from "@/components/molecules/loader/loader";
 
 export default function Home() {
   const router = useRouter();
@@ -15,8 +21,21 @@ export default function Home() {
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [guestId, setGuestId] = useState<string>("");
   const [isCompressionDone, setIsCompressionDone] = useState<boolean>(false);
+  const [isUploadComplete, setIsUploadComplete] = useState<boolean>(false);
+  const [uploadedFile, setUploadedFile] = useState<{
+    base64: string;
+    fileName: string;
+  } | null>(null);
+  const [uploadedImgId, setUploadedImgId] = useState({
+    id: "",
+    imageUrl: "",
+  });
+  const [isClicked, setIsClicked] = useState(false);
+  const [compressionValue, setCompressionValue] = useState<number>(50);
 
   const handleImageDrop = (file: File) => {
+    setIsUploadComplete(false);
+    setIsCompressionDone(false);
     if (!socket.connected) {
       socket.connect();
     }
@@ -24,6 +43,15 @@ export default function Home() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result;
+      if (!base64 || typeof base64 !== "string") {
+        console.error("Failed to read file as base64");
+        return;
+      }
+
+      setUploadedFile({
+        base64,
+        fileName: file?.name,
+      });
       console.log("base64", base64);
       socket.emit("authentication", {
         base64Image: base64,
@@ -71,10 +99,26 @@ export default function Home() {
     router.push("/");
   };
 
+  const compressHandler = () => {
+    console.log("clicked");
+    socket.emit("new-test", {
+      base64Image: uploadedFile?.base64,
+      fileName: uploadedFile?.file?.name,
+      uploadedFileId: uploadedImgId?.id,
+      originalUrl: uploadedImgId?.imageUrl,
+      compressionValue: compressionValue,
+    });
+    setIsClicked(true);
+  };
+
   useEffect(() => {
     socket.on("notification", (data) => {
       setIsCompressionDone(true);
+      setIsClicked(false);
       console.log("Got notification:", data);
+      if (data?.message) {
+        toast.success(data?.message);
+      }
       setImage((prev) => [
         ...prev,
         {
@@ -90,8 +134,20 @@ export default function Home() {
     socket.on("hello", (data) => {
       console.log("helloooooo", data);
     });
+    socket.on("upload-success", (data) => {
+      if (!data) return;
+
+      toast.success(data.message);
+
+      setIsUploadComplete(true);
+      setUploadedImgId({
+        id: data?.uploadedImgId || "",
+        imageUrl: data?.imageUrl || "",
+      });
+    });
 
     return () => {
+      socket.off("upload-success");
       socket.off("notification");
     };
   }, []);
@@ -152,14 +208,36 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full bg-white p-12">
-      <Header logoutHandler={handleLogout} hasToken={hasToken} />
-      <div className="w-full flex flex-row justify-between">
-        <div className="flex-flex-col gap-4">hello</div>
+    <div className="flex flex-col items-center justify-center w-full bg-white p-12 relative">
+      <Loader isLoading={isClicked && isUploadComplete && !isCompressionDone} />
+      <Header logoutHandler={handleLogout} hasToken={hasToken} isHomePage />
+      <div className="w-full flex flex-row justify-between my-10">
+        <div className="flex flex-col gap-4 p-4 w-[45%] justify-between">
+          <div>
+            <LeftHeader />
+            <CompressionSlider
+              min={10}
+              max={100}
+              step={5}
+              onChange={(val) => setCompressionValue(val)}
+            />
+          </div>
+
+          <Button
+            onClick={compressHandler}
+            type="submit"
+            btnText="Compress File"
+            className="rounded-[24px] bg-primary text-white w-full p-4"
+            icon={<ArrowRightIcon />}
+            isDisabled={!isUploadComplete || isCompressionDone || isClicked}
+          />
+        </div>
         <DragAndDrop
           onInputChange={(value: string) => console.log("value", value)}
           onDrop={handleImageDrop}
           isCompressionDone={isCompressionDone}
+          isUploadComplete={isUploadComplete}
+          setIsUploadComplete={setIsUploadComplete}
         />
       </div>
 
@@ -173,7 +251,6 @@ export default function Home() {
                 ? image[index]?.compressedImageFile
                 : image[index]?.originalImageFile || exampleImage
             }
-            imgTitle="example.png"
             progress={image[index]?.progress || 0}
             btnText={
               image[index]?.done ? "Download" : "Compression in Progress"

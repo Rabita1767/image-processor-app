@@ -12,7 +12,8 @@ dotenv.config();
 
 const compressAndUpload = async (
   buffer: ArrayBuffer,
-  filename: string
+  filename: string,
+  compressionValue: number
 ): Promise<string> => {
   const compressedDir = path.join(__dirname, "..", "..", "compressed");
   if (!fs.existsSync(compressedDir)) {
@@ -20,8 +21,9 @@ const compressAndUpload = async (
   }
   const compressedBuffer = await sharp(buffer)
     .resize({ width: 800 }) // example: resize width to 800px
-    .jpeg({ quality: 70 }) // compress to 70% quality
+    .jpeg({ quality: compressionValue })
     .toBuffer();
+  console.log("compressionValue", compressionValue);
   const uploadedURL = uploadToCloudinaryFromBuffer(compressedBuffer, filename);
   return uploadedURL;
 };
@@ -35,9 +37,14 @@ export const consumeQueue = async (io: Server) => {
     let consumerStarted = false;
     if (consumerStarted) return;
     if (!msg) return;
-    const { imageId, image, fileName, userId, originalImageUrl } = JSON.parse(
-      msg.content.toString()
-    );
+    const {
+      imageId,
+      image,
+      fileName,
+      userId,
+      originalImageUrl,
+      compressionValue,
+    } = JSON.parse(msg.content.toString());
     const buffer = Buffer.from(image, "base64");
     try {
       console.log("hjhjhkjhkh", { imageId, image, fileName, userId });
@@ -46,7 +53,11 @@ export const consumeQueue = async (io: Server) => {
         return;
       }
       console.log("jkljrklegjrlkjrlkjflr", buffer);
-      const outputPath = await compressAndUpload(buffer.buffer, fileName);
+      const outputPath = await compressAndUpload(
+        buffer.buffer,
+        fileName,
+        compressionValue
+      );
       const updateImage = await imageRepository.findByIdAndUpdate(
         imageId,
         outputPath

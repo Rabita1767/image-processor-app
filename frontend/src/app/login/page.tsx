@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { getUserIdFromToken } from "@/utils/util";
 import socket from "@/socket/socket";
+import Header from "@/components/molecules/header/header";
 
 const Login = () => {
   const router = useRouter();
@@ -58,36 +59,45 @@ const Login = () => {
   }, [isError, error]);
 
   return (
-    <div className="h-screen flex flex-col justify-center">
-      <h1 className="text-center text-2xl font-bold my-4">Login</h1>
-      <form
-        onSubmit={handleRegistration}
-        className="flex flex-col max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-gray-300 rounded-lg"
-      >
-        <div>
-          <p>Email</p>
-          <Input
-            type="text"
-            onChange={handleEmail}
-            value={email}
-            placeholder="Enter your email"
-            className="w-full mx-auto my-[8px]"
-            isRequired
+    <div className="h-screen flex flex-col p-8 gap-10">
+      <Header />
+      <div>
+        <h1 className="text-center text-2xl font-bold my-2 text-primary">
+          Login
+        </h1>
+        <form
+          onSubmit={handleRegistration}
+          className="flex flex-col max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-lightBlue rounded-lg"
+        >
+          <div>
+            <p>Email</p>
+            <Input
+              type="text"
+              onChange={handleEmail}
+              value={email}
+              placeholder="Enter your email"
+              className="w-full mx-auto my-[8px]"
+              isRequired
+            />
+          </div>
+          <div>
+            <p>Password</p>
+            <Input
+              type="password"
+              onChange={handlePassword}
+              value={password}
+              placeholder="Enter your password"
+              className="w-full mx-auto my-[8px]"
+              isRequired
+            />
+          </div>
+          <Button
+            btnText="Login"
+            className="mt-[8px] bg-primary text-white text-center rounded-[24px]"
+            type="submit"
           />
-        </div>
-        <div>
-          <p>Password</p>
-          <Input
-            type="password"
-            onChange={handlePassword}
-            value={password}
-            placeholder="Enter your password"
-            className="w-full mx-auto my-[8px]"
-            isRequired
-          />
-        </div>
-        <Button btnText="Login" className="mt-[8px]" type="submit" />
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

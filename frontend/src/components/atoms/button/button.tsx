@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import clsx from "clsx";
 
 interface IButton {
@@ -6,6 +6,8 @@ interface IButton {
   onClick?: (e?: React.FormEvent) => Promise<void> | void;
   btnText?: string;
   className?: string;
+  icon?: ReactNode;
+  isDisabled?: boolean;
 }
 
 const Button: React.FC<IButton> = ({
@@ -13,16 +15,28 @@ const Button: React.FC<IButton> = ({
   onClick,
   btnText = "Click Me",
   className,
+  icon,
+  isDisabled,
 }) => {
   const buttonClass = clsx(
-    "bg-blue-500 px-4 py-2 rounded transition-colors duration-300 font-semibold cursor-pointer",
-    "hover:bg-blue-600",
-    className
+    "flex items-center justify-between gap-2",
+    "bg-blue-500 px-4 py-2 rounded transition-colors duration-300 font-semibold",
+    className,
+    {
+      "cursor-not-allowed opacity-50": isDisabled,
+      "cursor-pointer": !isDisabled,
+    }
   );
 
   return (
-    <button type={type} onClick={onClick} className={buttonClass}>
+    <button
+      type={type}
+      onClick={onClick}
+      className={buttonClass}
+      disabled={isDisabled}
+    >
       {btnText}
+      {icon && <span className="flex items-center">{icon}</span>}
     </button>
   );
 };
