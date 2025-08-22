@@ -19,6 +19,7 @@ class ImageRepository {
     fileName: any,
     originalImageUrl: string
   ): Promise<IImage> {
+    console.log("enterr", userId);
     return await ImageModel.create({
       user: userId,
       filename: fileName,

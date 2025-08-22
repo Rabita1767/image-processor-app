@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { getUserIdFromToken } from "@/utils/util";
 import socket from "@/socket/socket";
 import Header from "@/components/molecules/header/header";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const router = useRouter();
@@ -59,7 +60,7 @@ const Login = () => {
   }, [isError, error]);
 
   return (
-    <div className="h-screen flex flex-col p-8 gap-10">
+    <div className="h-screen flex flex-col p-8 gap-10 ">
       <Header />
       <div>
         <h1 className="text-center text-2xl font-bold my-2 text-primary">
@@ -92,8 +93,8 @@ const Login = () => {
             />
           </div>
           <Button
-            btnText="Login"
-            className="mt-[8px] bg-primary text-white text-center rounded-[24px]"
+            btnText={isLoading ? <Loader2 /> : "Login"}
+            className="mt-[8px] bg-primary text-white rounded-[24px]"
             type="submit"
           />
         </form>

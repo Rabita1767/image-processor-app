@@ -2,6 +2,7 @@ import { Socket } from "socket.io";
 import imageRepository from "../repositories/imageRepository";
 import { getRabbitChannel } from "../config/rabbitMq";
 import uploadToCloudinaryFromBuffer from "../utils/cloudinary";
+import mongoose, { mongo } from "mongoose";
 
 const socketGateway = async (socket: Socket) => {
   const userId = socket.handshake.query.userId || "";

@@ -1,4 +1,5 @@
 export interface IImage {
+  rawFile: File;
   originalImageFile: string;
   compressedImageFile: string;
   fileName: string;

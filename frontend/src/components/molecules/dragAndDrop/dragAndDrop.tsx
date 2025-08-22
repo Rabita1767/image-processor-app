@@ -10,6 +10,8 @@ interface IDragAndDrop {
   isCompressionDone: boolean;
   isUploadComplete: boolean;
   setIsUploadComplete: React.Dispatch<React.SetStateAction<boolean>>;
+  isDrop: boolean;
+  setIsDrop: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const DragAndDrop: React.FC<IDragAndDrop> = ({
   onInputChange,
@@ -17,9 +19,9 @@ const DragAndDrop: React.FC<IDragAndDrop> = ({
   isCompressionDone,
   isUploadComplete,
   setIsUploadComplete,
+  isDrop,
+  setIsDrop,
 }) => {
-  const [isDrop, setIsDrop] = useState<boolean>(false);
-
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];

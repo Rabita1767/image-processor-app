@@ -13,10 +13,11 @@ import { ArrowRightIcon } from "lucide-react";
 import { toast } from "react-toastify";
 import CompressionSlider from "@/components/molecules/compressionSlider/compressionSlider";
 import Loader from "@/components/molecules/loader/loader";
+import { getUserIdFromToken } from "@/utils/util";
 
 export default function Home() {
   const router = useRouter();
-  const [originalImage, setOriginalImage] = useState<File[]>([]);
+  // const [originalImage, setOriginalImage] = useState<File[]>([]);
   const [image, setImage] = useState<IImage[]>([]);
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [guestId, setGuestId] = useState<string>("");
@@ -32,14 +33,29 @@ export default function Home() {
   });
   const [isClicked, setIsClicked] = useState(false);
   const [compressionValue, setCompressionValue] = useState<number>(50);
+  const [isDrop, setIsDrop] = useState<boolean>(false);
+  const [userId, setUserId] = useState("");
 
   const handleImageDrop = (file: File) => {
     setIsUploadComplete(false);
     setIsCompressionDone(false);
     if (!socket.connected) {
+      hasToken
+        ? (socket.io.opts.query = { userId: userId })
+        : (socket.io.opts.query = { userId: guestId });
       socket.connect();
     }
-    setOriginalImage((prev) => [...prev, file]);
+    // setOriginalImage((prev) => [...prev, file]);
+    const newFile: IImage = {
+      rawFile: file,
+      originalImageFile: "",
+      compressedImageFile: "",
+      fileName: "",
+      imageId: "",
+      progress: 0,
+      done: false,
+    };
+    setImage((prev) => [...prev, newFile]);
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result;
@@ -91,7 +107,7 @@ export default function Home() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
     setImage([]);
-    setOriginalImage([]);
+    // setOriginalImage([]);
     setHasToken(false);
     socket.disconnect();
     socket.io.opts.query = { userId: guestId };
@@ -101,6 +117,7 @@ export default function Home() {
 
   const compressHandler = () => {
     console.log("clicked");
+    setIsUploadComplete(false);
     socket.emit("new-test", {
       base64Image: uploadedFile?.base64,
       fileName: uploadedFile?.file?.name,
@@ -119,17 +136,34 @@ export default function Home() {
       if (data?.message) {
         toast.success(data?.message);
       }
-      setImage((prev) => [
-        ...prev,
-        {
-          originalImageFile: data?.originalImageUrl,
-          fileName: data?.fileName,
-          imageId: data?.imageId,
-          compressedImageFile: data?.compressedImageUrl,
-          progress: 100,
-          done: true,
-        },
-      ]);
+      // setImage((prev) => [
+      //   ...prev,
+      //   {
+      //     originalImageFile: data?.originalImageUrl,
+      //     fileName: data?.fileName,
+      //     imageId: data?.imageId,
+      //     compressedImageFile: data?.compressedImageUrl,
+      //     progress: 100,
+      //     done: true,
+      //   },
+      // ]);
+
+      setImage((prev) => {
+        if (prev.length === 0) return prev;
+        return prev.map((img, index) => {
+          return index === prev.length - 1
+            ? {
+                ...img,
+                originalImageFile: data?.originalImageUrl,
+                fileName: data?.fileName,
+                imageId: data?.imageId,
+                compressedImageFile: data?.compressedImageUrl,
+                progress: 100,
+                done: true,
+              }
+            : img;
+        });
+      });
     });
     socket.on("hello", (data) => {
       console.log("helloooooo", data);
@@ -140,6 +174,7 @@ export default function Home() {
       toast.success(data.message);
 
       setIsUploadComplete(true);
+      setIsDrop(false);
       setUploadedImgId({
         id: data?.uploadedImgId || "",
         imageUrl: data?.imageUrl || "",
@@ -196,9 +231,11 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== undefined) {
       const token = localStorage.getItem("accessToken") || "";
-      if (token) {
-        setHasToken(true);
-      }
+
+      if (!token) return;
+      const currentUserId = getUserIdFromToken(token);
+      setUserId(currentUserId ?? "");
+      setHasToken(true);
     }
   }, []);
 
@@ -209,7 +246,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full bg-white p-12 relative">
-      <Loader isLoading={isClicked && isUploadComplete && !isCompressionDone} />
+      {/* <Loader isLoading={isDrop && !isUploadComplete} /> */}
       <Header logoutHandler={handleLogout} hasToken={hasToken} isHomePage />
       <div className="w-full flex flex-row justify-between my-10">
         <div className="flex flex-col gap-4 p-4 w-[45%] justify-between">
@@ -238,23 +275,23 @@ export default function Home() {
           isCompressionDone={isCompressionDone}
           isUploadComplete={isUploadComplete}
           setIsUploadComplete={setIsUploadComplete}
+          isDrop={isDrop}
+          setIsDrop={setIsDrop}
         />
       </div>
 
-      {originalImage &&
-        originalImage.length > 0 &&
-        originalImage.map((img: any, index: number) => (
+      {image &&
+        image.length > 0 &&
+        image.map((img: any, index: number) => (
           <ImagePreview
             key={index}
             imgSrc={
-              image[index]?.progress === 100
-                ? image[index]?.compressedImageFile
-                : image[index]?.originalImageFile || exampleImage
+              img.progress === 100
+                ? img?.compressedImageFile
+                : img?.originalImageFile || exampleImage
             }
-            progress={image[index]?.progress || 0}
-            btnText={
-              image[index]?.done ? "Download" : "Compression in Progress"
-            }
+            progress={img?.progress || 0}
+            btnText={img?.done ? "Download" : "Compression in Progress"}
             clickHandler={() =>
               handleDownload(image[index]?.compressedImageFile)
             }

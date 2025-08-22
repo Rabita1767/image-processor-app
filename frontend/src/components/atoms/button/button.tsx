@@ -4,7 +4,7 @@ import clsx from "clsx";
 interface IButton {
   type?: "button" | "submit" | "reset";
   onClick?: (e?: React.FormEvent) => Promise<void> | void;
-  btnText?: string;
+  btnText?: string | ReactNode;
   className?: string;
   icon?: ReactNode;
   isDisabled?: boolean;
