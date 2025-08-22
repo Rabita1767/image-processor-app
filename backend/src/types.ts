@@ -11,7 +11,7 @@ export interface IUser extends Document {
 }
 
 export interface IImage extends Document {
-  user?: Types.ObjectId;
+  user: Types.ObjectId;
   guestId?: string;
   filename: string;
   originalImageUrl: string;

@@ -50,36 +50,6 @@ const socketGateway = async (socket: Socket) => {
         imageUrl: originalUrl,
         uploadedImgId: uploadImage._id,
       });
-      // const channel = await getRabbitChannel();
-      // channel.sendToQueue(
-      //   "compress",
-      //   Buffer.from(
-      //     JSON.stringify({
-      //       imageId: uploadImage._id,
-      //       image: buffer,
-      //       originalImageUrl: originalUrl,
-      //       userId: userId,
-      //       fileName: uploadImage.filename,
-      //     })
-      //   )
-      // );
-      // socket.on("new-test", async (data) => {
-      //   console.log("gotcha", data);
-      //   if (!data) return;
-      //   const channel = await getRabbitChannel();
-      //   channel.sendToQueue(
-      //     "compress",
-      //     Buffer.from(
-      //       JSON.stringify({
-      //         imageId: uploadImage._id,
-      //         image: buffer,
-      //         originalImageUrl: originalUrl,
-      //         userId: userId,
-      //         fileName: uploadImage.filename,
-      //       })
-      //     )
-      //   );
-      // });
     } catch (err) {
       console.error("Error uploading image:", err);
       socket.emit("upload-error", { error: err.message });
@@ -90,7 +60,7 @@ const socketGateway = async (socket: Socket) => {
     message: "Hello from the server!",
     socketId: socket.id,
   });
-  socket.on("new-test", async (data) => {
+  socket.on("startCompression", async (data) => {
     const findUploadedImage = await imageRepository.findImageById(
       data?.uploadedFileId
     );

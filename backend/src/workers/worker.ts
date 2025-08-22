@@ -47,7 +47,14 @@ export const consumeQueue = async (io: Server) => {
     } = JSON.parse(msg.content.toString());
     const buffer = Buffer.from(image, "base64");
     try {
-      console.log("hjhjhkjhkh", { imageId, image, fileName, userId });
+      console.log("hjhjhkjhkh", {
+        imageId,
+        image,
+        fileName,
+        userId,
+        originalImageUrl,
+        compressionValue,
+      });
       if (!fileName) {
         console.error("Filename is missing in the message");
         return;

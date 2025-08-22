@@ -17,20 +17,11 @@ import { getUserIdFromToken } from "@/utils/util";
 
 export default function Home() {
   const router = useRouter();
-  // const [originalImage, setOriginalImage] = useState<File[]>([]);
   const [image, setImage] = useState<IImage[]>([]);
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [guestId, setGuestId] = useState<string>("");
   const [isCompressionDone, setIsCompressionDone] = useState<boolean>(false);
   const [isUploadComplete, setIsUploadComplete] = useState<boolean>(false);
-  const [uploadedFile, setUploadedFile] = useState<{
-    base64: string;
-    fileName: string;
-  } | null>(null);
-  const [uploadedImgId, setUploadedImgId] = useState({
-    id: "",
-    imageUrl: "",
-  });
   const [isClicked, setIsClicked] = useState(false);
   const [compressionValue, setCompressionValue] = useState<number>(50);
   const [isDrop, setIsDrop] = useState<boolean>(false);
@@ -45,17 +36,7 @@ export default function Home() {
         : (socket.io.opts.query = { userId: guestId });
       socket.connect();
     }
-    // setOriginalImage((prev) => [...prev, file]);
-    const newFile: IImage = {
-      rawFile: file,
-      originalImageFile: "",
-      compressedImageFile: "",
-      fileName: "",
-      imageId: "",
-      progress: 0,
-      done: false,
-    };
-    setImage((prev) => [...prev, newFile]);
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result;
@@ -63,11 +44,16 @@ export default function Home() {
         console.error("Failed to read file as base64");
         return;
       }
-
-      setUploadedFile({
-        base64,
+      const newFile: IImage = {
+        base64: base64,
+        originalImageFile: "",
+        compressedImageFile: "",
         fileName: file?.name,
-      });
+        imageId: "",
+        progress: 0,
+        done: false,
+      };
+      setImage((prev) => [...prev, newFile]);
       console.log("base64", base64);
       socket.emit("authentication", {
         base64Image: base64,
@@ -115,14 +101,19 @@ export default function Home() {
     router.push("/");
   };
 
-  const compressHandler = () => {
-    console.log("clicked");
+  const compressHandler = (
+    imageId: string,
+    originalImageFile: string,
+    base64: string,
+    fileName: string
+  ) => {
+    console.log("clicked", imageId, originalImageFile);
     setIsUploadComplete(false);
-    socket.emit("new-test", {
-      base64Image: uploadedFile?.base64,
-      fileName: uploadedFile?.file?.name,
-      uploadedFileId: uploadedImgId?.id,
-      originalUrl: uploadedImgId?.imageUrl,
+    socket.emit("startCompression", {
+      base64Image: base64,
+      fileName: fileName,
+      uploadedFileId: imageId,
+      originalUrl: originalImageFile,
       compressionValue: compressionValue,
     });
     setIsClicked(true);
@@ -136,27 +127,12 @@ export default function Home() {
       if (data?.message) {
         toast.success(data?.message);
       }
-      // setImage((prev) => [
-      //   ...prev,
-      //   {
-      //     originalImageFile: data?.originalImageUrl,
-      //     fileName: data?.fileName,
-      //     imageId: data?.imageId,
-      //     compressedImageFile: data?.compressedImageUrl,
-      //     progress: 100,
-      //     done: true,
-      //   },
-      // ]);
-
       setImage((prev) => {
         if (prev.length === 0) return prev;
         return prev.map((img, index) => {
-          return index === prev.length - 1
+          return img.imageId === data?.imageId
             ? {
                 ...img,
-                originalImageFile: data?.originalImageUrl,
-                fileName: data?.fileName,
-                imageId: data?.imageId,
                 compressedImageFile: data?.compressedImageUrl,
                 progress: 100,
                 done: true,
@@ -165,7 +141,7 @@ export default function Home() {
         });
       });
     });
-    socket.on("hello", (data) => {
+    socket.on("testing", (data) => {
       console.log("helloooooo", data);
     });
     socket.on("upload-success", (data) => {
@@ -175,9 +151,17 @@ export default function Home() {
 
       setIsUploadComplete(true);
       setIsDrop(false);
-      setUploadedImgId({
-        id: data?.uploadedImgId || "",
-        imageUrl: data?.imageUrl || "",
+      setImage((prev) => {
+        if (prev.length === 0) return prev;
+        return prev.map((img, index) => {
+          return index === prev.length - 1
+            ? {
+                ...img,
+                originalImageFile: data?.imageUrl || "",
+                imageId: data?.uploadedImgId || "",
+              }
+            : img;
+        });
       });
     });
 
@@ -246,7 +230,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full bg-white p-12 relative">
-      {/* <Loader isLoading={isDrop && !isUploadComplete} /> */}
       <Header logoutHandler={handleLogout} hasToken={hasToken} isHomePage />
       <div className="w-full flex flex-row justify-between my-10">
         <div className="flex flex-col gap-4 p-4 w-[45%] justify-between">
@@ -260,14 +243,14 @@ export default function Home() {
             />
           </div>
 
-          <Button
+          {/* <Button
             onClick={compressHandler}
             type="submit"
             btnText="Compress File"
             className="rounded-[24px] bg-primary text-white w-full p-4"
             icon={<ArrowRightIcon />}
             isDisabled={!isUploadComplete || isCompressionDone || isClicked}
-          />
+          /> */}
         </div>
         <DragAndDrop
           onInputChange={(value: string) => console.log("value", value)}
@@ -291,9 +274,14 @@ export default function Home() {
                 : img?.originalImageFile || exampleImage
             }
             progress={img?.progress || 0}
-            btnText={img?.done ? "Download" : "Compression in Progress"}
+            btnText={img?.done ? "Download" : "Compress"}
             clickHandler={() =>
-              handleDownload(image[index]?.compressedImageFile)
+              compressHandler(
+                img.imageId,
+                img.originalImageFile,
+                img.base64,
+                img.fileName
+              )
             }
           />
         ))}
