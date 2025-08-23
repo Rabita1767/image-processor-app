@@ -60,6 +60,14 @@ export const api = createApi({
         method: "GET",
       }),
     }),
+    // Upload image (reauth required)
+    uploadImage: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: "/image/uploadImage",
+        method: "POST",
+        body: formData,
+      }),
+    }),
   }),
 });
 
@@ -68,4 +76,5 @@ export const {
   useSignupMutation,
   useLoginMutation,
   useGetUserImagesQuery,
+  useUploadImageMutation,
 } = api;

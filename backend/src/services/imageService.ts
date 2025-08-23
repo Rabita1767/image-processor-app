@@ -8,6 +8,7 @@ import { Messages } from "../utils/messages";
 import fs from "fs";
 import mongoose from "mongoose";
 import { consumeQueue } from "../workers/worker";
+import uploadToCloudinaryFromBuffer from "../utils/cloudinary";
 
 class ImageService {
   public async downloadProcessedImage(params: { url: string }): Promise<any> {
@@ -105,6 +106,50 @@ class ImageService {
       console.log(error);
       throw new AppError(
         Messages.ERROR_FETCHING_IMAGES,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  public async uploadImage(
+    file: any,
+    userId?: mongoose.Types.ObjectId,
+    payload?: any
+  ) {
+    try {
+      if (!file) {
+        throw new AppError(
+          Messages.PLEASE_UPLOAD_A_FILE,
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
+      const { buffer, originalname } = file;
+      const imageUrl = await uploadToCloudinaryFromBuffer(buffer, originalname);
+      let uploadImage;
+      if (userId) {
+        uploadImage = await imageRepository.uploadImageAsUser(
+          userId,
+          originalname,
+          imageUrl
+        );
+      } else {
+        uploadImage = await imageRepository.uploadImageAsGuest(
+          payload.guestId,
+          originalname,
+          imageUrl
+        );
+      }
+      if (!uploadImage) {
+        throw new AppError(
+          Messages.ERROR_UPLOADING_IMAGE,
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
+      return uploadImage;
+    } catch (error) {
+      console.log(error);
+      throw new AppError(
+        Messages.ERROR_UPLOADING_IMAGE,
         HTTP_STATUS.INTERNAL_SERVER_ERROR
       );
     }

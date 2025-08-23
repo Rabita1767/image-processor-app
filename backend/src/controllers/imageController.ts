@@ -75,5 +75,28 @@ class ImageController {
       return next(error);
     }
   }
+
+  public async uploadImage(
+    req: CustomRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const uploadImage = await imageService.uploadImage(
+        req.file,
+        req.userId || undefined,
+        req.body || {}
+      );
+      return sendResponse(
+        res,
+        HTTP_STATUS.OK,
+        Messages.IMAGE_UPLOADED_SUCCESSFULLY,
+        uploadImage
+      );
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
 }
 export default new ImageController();

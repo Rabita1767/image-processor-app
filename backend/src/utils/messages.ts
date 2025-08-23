@@ -34,4 +34,6 @@ export const Messages = {
   SERVER_ERROR: "Server error occurred",
   PLEASE_SIGN_UP: "Please sign up first",
   USER_ALREADY_EXISTS: "User already exists",
+  IMAGE_UPLOADED_SUCCESSFULLY: "Image uploaded successfully",
+  PLEASE_UPLOAD_A_FILE: "Please upload a file",
 };

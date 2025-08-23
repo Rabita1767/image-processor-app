@@ -15,7 +15,7 @@ class ImageRepository {
   }
 
   public async uploadImageAsUser(
-    userId: string | undefined,
+    userId: mongoose.Types.ObjectId,
     fileName: any,
     originalImageUrl: string
   ): Promise<IImage> {

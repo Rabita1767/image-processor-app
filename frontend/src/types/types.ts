@@ -1,9 +1,11 @@
 export interface IImage {
-  base64: string;
+  rawFile: File;
   originalImageFile: string;
   compressedImageFile: string;
   fileName: string;
   imageId: string;
-  progress: number;
+  uploadProgress: number;
+  compressProgress: number;
   done: boolean;
+  hasCompressionStarted: boolean;
 }
