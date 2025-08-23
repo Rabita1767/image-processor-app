@@ -68,6 +68,14 @@ export const api = createApi({
         body: formData,
       }),
     }),
+    // compressImage (reauth required)
+    compressImage: builder.mutation<any, { imageId: string; payload: any }>({
+      query: ({ imageId, payload }) => ({
+        url: `/image/compress/${imageId}`,
+        method: "POST",
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -77,4 +85,5 @@ export const {
   useLoginMutation,
   useGetUserImagesQuery,
   useUploadImageMutation,
+  useCompressImageMutation,
 } = api;

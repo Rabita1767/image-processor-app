@@ -7,6 +7,7 @@ import mongoose, { mongo } from "mongoose";
 const socketGateway = async (socket: Socket) => {
   const userId = socket.handshake.query.userId || "";
   const token = socket.handshake.auth.token || "";
+  socket.join(userId);
   const users: any = {};
   console.log("tokkkeeeeeeen", token);
   console.log("userId", userId);

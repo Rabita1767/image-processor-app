@@ -15,10 +15,10 @@ const compressAndUpload = async (
   filename: string,
   compressionValue: number
 ): Promise<string> => {
-  const compressedDir = path.join(__dirname, "..", "..", "compressed");
-  if (!fs.existsSync(compressedDir)) {
-    fs.mkdirSync(compressedDir, { recursive: true });
-  }
+  // const compressedDir = path.join(__dirname, "..", "..", "compressed");
+  // if (!fs.existsSync(compressedDir)) {
+  //   fs.mkdirSync(compressedDir, { recursive: true });
+  // }
   const compressedBuffer = await sharp(buffer)
     .resize({ width: 800 }) // example: resize width to 800px
     .jpeg({ quality: compressionValue })

@@ -9,6 +9,7 @@ import fs from "fs";
 import mongoose from "mongoose";
 import { consumeQueue } from "../workers/worker";
 import uploadToCloudinaryFromBuffer from "../utils/cloudinary";
+import axios from "axios";
 
 class ImageService {
   public async downloadProcessedImage(params: { url: string }): Promise<any> {
@@ -150,6 +151,52 @@ class ImageService {
       console.log(error);
       throw new AppError(
         Messages.ERROR_UPLOADING_IMAGE,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  public async compressImage(
+    params: any,
+    payload: any,
+    userId?: mongoose.Types.ObjectId
+  ) {
+    try {
+      const { imageId } = params;
+      if (!imageId) {
+        throw new AppError(Messages.IMAGE_ID_REQUIRED, HTTP_STATUS.NOT_FOUND);
+      }
+      let findImage;
+      if (userId) {
+        findImage = await imageRepository.findImage(userId, imageId);
+      } else {
+        findImage = await imageRepository.findImageById(imageId);
+      }
+      if (!findImage) {
+        throw new AppError(Messages.IMAGE_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+      }
+      const response = await axios.get(findImage.originalImageUrl, {
+        responseType: "arraybuffer",
+      });
+      const buffer = Buffer.from(response.data);
+      const channel = await getRabbitChannel();
+      channel.sendToQueue(
+        "compress",
+        Buffer.from(
+          JSON.stringify({
+            imageId: findImage._id,
+            image: buffer,
+            originalImageUrl: findImage.originalImageUrl,
+            userId: userId ? userId : payload.guestId,
+            fileName: findImage.filename,
+            compressionValue: payload.compressionValue ?? 50,
+          })
+        )
+      );
+    } catch (error) {
+      console.log(error);
+      throw new AppError(
+        Messages.ERROR_COMPRESSING_IMAGE,
         HTTP_STATUS.INTERNAL_SERVER_ERROR
       );
     }

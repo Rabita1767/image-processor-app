@@ -98,5 +98,32 @@ class ImageController {
       next(error);
     }
   }
+
+  public async compressImage(
+    req: CustomRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const compressImage = await imageService.compressImage(
+        req.params,
+        req.body,
+        req.userId || undefined
+      );
+      return sendResponse(
+        res,
+        HTTP_STATUS.OK,
+        Messages.IMAGE_COMPRESS_SUCCESS,
+        compressImage
+      );
+    } catch (error) {
+      console.log(error);
+      return sendResponse(
+        res,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        Messages.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
 export default new ImageController();

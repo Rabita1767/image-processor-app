@@ -2,23 +2,28 @@
 import Image, { StaticImageData } from "next/image";
 import Button from "@/components/atoms/button/button";
 import ProgressBar from "@/components/atoms/progressBar/progressBar";
+import { Loader2 } from "lucide-react";
 import { File } from "buffer";
+import Loader from "../loader/loader";
 
 interface IImagePreview {
   imgSrc: string | StaticImageData;
-
   progress?: number;
   btnText?: string;
+  hasCompressionStarted: boolean;
+  isCompressionProgress: boolean;
   clickHandler?: () => void;
 }
 
 const ImagePreview: React.FC<IImagePreview> = ({
   imgSrc,
-
   progress,
   btnText,
+  hasCompressionStarted,
+  isCompressionProgress,
   clickHandler,
 }) => {
+  console.log("jkhk", { hasCompressionStarted, isCompressionProgress });
   return (
     <div className="flex flex-col w-full h-[170px] mx-auto border border-lightBlue p-4 rounded-lg items-center gap-4 mb-4">
       <div className="flex flex-row gap-2 justify-between w-full">
@@ -29,7 +34,12 @@ const ImagePreview: React.FC<IImagePreview> = ({
             fill
             className="object-contain p-[8px] rounded-[8px]"
           />
+          <Loader
+            isLoading={hasCompressionStarted && isCompressionProgress}
+            fullScreen={false}
+          />
         </div>
+
         <div>
           <Button
             onClick={clickHandler ? clickHandler : () => {}}

@@ -62,5 +62,9 @@ class ImageRepository {
   ): Promise<IImage[]> {
     return await ImageModel.find({ user: userId });
   }
+
+  public async findImage(userId: mongoose.Types.ObjectId, imageId: string) {
+    return await ImageModel.findOne({ _id: imageId, user: userId });
+  }
 }
 export default new ImageRepository();

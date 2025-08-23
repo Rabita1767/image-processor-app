@@ -16,4 +16,9 @@ router.get(
   authMiddleware.auth,
   imageController.getUserImages
 );
+router.post(
+  "/compress/:imageId",
+  authMiddleware.auth,
+  imageController.compressImage
+);
 export default router;

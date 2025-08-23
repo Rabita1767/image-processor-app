@@ -36,4 +36,5 @@ export const Messages = {
   USER_ALREADY_EXISTS: "User already exists",
   IMAGE_UPLOADED_SUCCESSFULLY: "Image uploaded successfully",
   PLEASE_UPLOAD_A_FILE: "Please upload a file",
+  IMAGE_ID_REQUIRED: "Image Id is required",
 };

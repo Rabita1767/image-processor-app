@@ -11,7 +11,10 @@ import LeftHeader from "@/components/leftHeader/leftHeader";
 import { toast } from "react-toastify";
 import CompressionSlider from "@/components/molecules/compressionSlider/compressionSlider";
 import { getUserIdFromToken } from "@/utils/util";
-import { useUploadImageMutation } from "@/redux/services/api";
+import {
+  useCompressImageMutation,
+  useUploadImageMutation,
+} from "@/redux/services/api";
 import imageCompression from "browser-image-compression";
 
 export default function Home() {
@@ -29,6 +32,15 @@ export default function Home() {
     uploadImage,
     { data: uploadedImageData, isSuccess, isLoading, isError, error },
   ] = useUploadImageMutation();
+  const [
+    compressImage,
+    {
+      isSuccess: isCompressionSuccess,
+      isLoading: isCompressionLoading,
+      data: compressedImageData,
+      isError: isCompressionError,
+    },
+  ] = useCompressImageMutation();
 
   // const handleImageDrop = (file: File) => {
   //   setIsUploadComplete(false);
@@ -114,6 +126,7 @@ export default function Home() {
   };
 
   const handleDownload = async (url: string) => {
+    console.log("clickinggg", url);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/image/download/${encodeURIComponent(
@@ -151,24 +164,64 @@ export default function Home() {
     router.push("/");
   };
 
-  const compressHandler = (
-    imageId: string,
-    originalImageFile: string,
-    base64: string,
-    fileName: string
-  ) => {
-    console.log("clicked", imageId, originalImageFile);
-    setIsUploadComplete(false);
-    socket.emit("startCompression", {
-      base64Image: base64,
-      fileName: fileName,
-      uploadedFileId: imageId,
-      originalUrl: originalImageFile,
-      compressionValue: compressionValue,
-    });
-    setIsClicked(true);
-  };
+  // const compressHandler = (
+  //   imageId: string,
+  //   originalImageFile: string,
+  //   base64: string,
+  //   fileName: string
+  // ) => {
+  //   console.log("clicked", imageId, originalImageFile);
+  //   setIsUploadComplete(false);
+  //   socket.emit("startCompression", {
+  //     base64Image: base64,
+  //     fileName: fileName,
+  //     uploadedFileId: imageId,
+  //     originalUrl: originalImageFile,
+  //     compressionValue: compressionValue,
+  //   });
+  //   setIsClicked(true);
+  // };
 
+  const compressHandler = async (imageId: string) => {
+    if (!socket.connected) {
+      hasToken
+        ? (socket.io.opts.query = { userId: userId })
+        : (socket.io.opts.query = { userId: guestId });
+      socket.connect();
+    }
+    setImage((prev) => {
+      if (prev.length === 0) return prev;
+      return prev.map((img, index) => {
+        return img.imageId === imageId
+          ? {
+              ...img,
+              hasCompressionStarted: true,
+            }
+          : img;
+      });
+    });
+    try {
+      if (userId) {
+        const payload = {
+          compressionValue: compressionValue,
+        };
+        await compressImage({
+          imageId,
+          payload: payload,
+        }).unwrap();
+        return;
+      }
+
+      const res = await compressImage({
+        imageId,
+        payload: { compressionValue: compressionValue, guestId: guestId },
+      }).unwrap();
+
+      console.log("Compressed image:", res);
+    } catch (err) {
+      console.error("Compression failed:", err);
+    }
+  };
   useEffect(() => {
     socket.on("notification", (data) => {
       setIsCompressionDone(true);
@@ -184,31 +237,8 @@ export default function Home() {
             ? {
                 ...img,
                 compressedImageFile: data?.compressedImageUrl,
-                progress: 100,
+                compressProgress: 100,
                 done: true,
-              }
-            : img;
-        });
-      });
-    });
-    socket.on("testing", (data) => {
-      console.log("helloooooo", data);
-    });
-    socket.on("upload-success", (data) => {
-      if (!data) return;
-
-      toast.success(data.message);
-
-      setIsUploadComplete(true);
-      setIsDrop(false);
-      setImage((prev) => {
-        if (prev.length === 0) return prev;
-        return prev.map((img, index) => {
-          return index === prev.length - 1
-            ? {
-                ...img,
-                originalImageFile: data?.imageUrl || "",
-                imageId: data?.uploadedImgId || "",
               }
             : img;
         });
@@ -216,7 +246,6 @@ export default function Home() {
     });
 
     return () => {
-      socket.off("upload-success");
       socket.off("notification");
     };
   }, []);
@@ -298,7 +327,15 @@ export default function Home() {
   }, [isSuccess]);
 
   useEffect(() => {
+    if (!isCompressionSuccess) return;
+    console.log("hejshdejsdhje", compressedImageData);
+  }, [isCompressionSuccess]);
+
+  useEffect(() => {
     if (!socket.connected) {
+      hasToken
+        ? (socket.io.opts.query = { userId: userId })
+        : (socket.io.opts.query = { userId: guestId });
       socket.connect();
     }
   }, []);
@@ -350,15 +387,30 @@ export default function Home() {
                 ? img?.compressedImageFile
                 : exampleImage
             }
+            hasCompressionStarted={img.hasCompressionStarted}
+            isCompressionProgress={
+              img.uploadProgress === 100 && img.compressProgress < 100
+            }
             progress={img?.uploadProgress || 0}
-            btnText={img?.uploadProgress === 100 ? "Compress" : "Uploading"}
-            clickHandler={() =>
-              compressHandler(
-                img.imageId,
-                img.originalImageFile,
-                img.base64,
-                img.fileName
-              )
+            btnText={
+              img?.uploadProgress < 100
+                ? "Uploading..."
+                : img?.uploadProgress === 100 && img.compressProgress < 100
+                ? "Compress"
+                : img.hasCompressionStarted &&
+                  img?.uploadProgress === 100 &&
+                  img.compressProgress < 100
+                ? "Compressing..."
+                : img?.uploadProgress === 100 && img.compressProgress === 100
+                ? "Download"
+                : "Downloading..."
+            }
+            clickHandler={
+              img?.uploadProgress === 100 && img.compressProgress < 100
+                ? () => compressHandler(img.imageId)
+                : img?.uploadProgress === 100 && img.compressProgress === 100
+                ? () => handleDownload(img.compressedImageFile)
+                : () => {}
             }
           />
         ))}
