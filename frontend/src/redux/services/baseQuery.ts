@@ -34,7 +34,6 @@ export const baseQueryWithReauth: BaseQueryFn<
     );
 
     if (refreshResult.data) {
-      console.log("Access token refreshed successfully", refreshResult);
       const newAccessToken = (refreshResult.data as { data: string }).data;
       const userId = getUserIdFromToken(newAccessToken);
       localStorage.setItem("accessToken", newAccessToken);

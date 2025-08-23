@@ -23,7 +23,6 @@ const ImagePreview: React.FC<IImagePreview> = ({
   isCompressionProgress,
   clickHandler,
 }) => {
-  console.log("jkhk", { hasCompressionStarted, isCompressionProgress });
   return (
     <div className="flex flex-col w-full h-[170px] mx-auto border border-lightBlue p-4 rounded-lg items-center gap-4 mb-4">
       <div className="flex flex-row gap-2 justify-between w-full">

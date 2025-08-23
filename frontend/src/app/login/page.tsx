@@ -49,7 +49,6 @@ const Login = () => {
 
   useEffect(() => {
     if (!isError) return;
-    console.log("Login error:", error);
     if ("data" in error) {
       toast.error(
         (error.data as { message?: string })?.message || "Login failed"

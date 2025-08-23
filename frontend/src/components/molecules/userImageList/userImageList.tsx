@@ -3,7 +3,6 @@ interface UserImageListProps {
 }
 
 const UserImageList: React.FC<UserImageListProps> = ({ data }) => {
-  console.log("dataaaaaaaaaaaa", data);
   return (
     <>
       {data && data.length > 0 && (

@@ -15,15 +15,10 @@ const compressAndUpload = async (
   filename: string,
   compressionValue: number
 ): Promise<string> => {
-  // const compressedDir = path.join(__dirname, "..", "..", "compressed");
-  // if (!fs.existsSync(compressedDir)) {
-  //   fs.mkdirSync(compressedDir, { recursive: true });
-  // }
   const compressedBuffer = await sharp(buffer)
     .resize({ width: 800 }) // example: resize width to 800px
     .jpeg({ quality: compressionValue })
     .toBuffer();
-  console.log("compressionValue", compressionValue);
   const uploadedURL = uploadToCloudinaryFromBuffer(compressedBuffer, filename);
   return uploadedURL;
 };
@@ -47,19 +42,10 @@ export const consumeQueue = async (io: Server) => {
     } = JSON.parse(msg.content.toString());
     const buffer = Buffer.from(image, "base64");
     try {
-      console.log("hjhjhkjhkh", {
-        imageId,
-        image,
-        fileName,
-        userId,
-        originalImageUrl,
-        compressionValue,
-      });
       if (!fileName) {
         console.error("Filename is missing in the message");
         return;
       }
-      console.log("jkljrklegjrlkjrlkjflr", buffer);
       const outputPath = await compressAndUpload(
         buffer.buffer,
         fileName,
@@ -80,7 +66,6 @@ export const consumeQueue = async (io: Server) => {
         compressedImageUrl: outputPath,
       });
 
-      console.log("Image processed and saved at:", outputPath);
       channel.ack(msg);
     } catch (error) {
       console.error("Error processing image:", error);

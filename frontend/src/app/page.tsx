@@ -90,7 +90,6 @@ export default function Home() {
   };
 
   const handleDownload = async (url: string) => {
-    console.log("clickinggg", url);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/image/download/${encodeURIComponent(
@@ -120,7 +119,6 @@ export default function Home() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
     setImage([]);
-    // setOriginalImage([]);
     setHasToken(false);
     socket.disconnect();
     socket.io.opts.query = { userId: guestId };
@@ -162,8 +160,6 @@ export default function Home() {
         imageId,
         payload: { compressionValue: compressionValue, guestId: guestId },
       }).unwrap();
-
-      console.log("Compressed image:", res);
     } catch (err) {
       console.error("Compression failed:", err);
     }
@@ -255,7 +251,6 @@ export default function Home() {
 
   useEffect(() => {
     if (!isSuccess) return;
-    console.log("dataaaaaaaaaaaaaiiiiiii", uploadedImageData);
     setImage((prev) => {
       if (prev.length === 0) return prev;
       return prev.map((img, index) => {
@@ -274,7 +269,6 @@ export default function Home() {
 
   useEffect(() => {
     if (!isCompressionSuccess) return;
-    console.log("hejshdejsdhje", compressedImageData);
   }, [isCompressionSuccess]);
 
   useEffect(() => {
@@ -300,15 +294,6 @@ export default function Home() {
               onChange={(val) => setCompressionValue(val)}
             />
           </div>
-
-          {/* <Button
-            onClick={compressHandler}
-            type="submit"
-            btnText="Compress File"
-            className="rounded-[24px] bg-primary text-white w-full p-4"
-            icon={<ArrowRightIcon />}
-            isDisabled={!isUploadComplete || isCompressionDone || isClicked}
-          /> */}
         </div>
         <DragAndDrop
           onInputChange={(value: string) => console.log("value", value)}
