@@ -42,42 +42,6 @@ export default function Home() {
     },
   ] = useCompressImageMutation();
 
-  // const handleImageDrop = (file: File) => {
-  //   setIsUploadComplete(false);
-  //   setIsCompressionDone(false);
-  //   if (!socket.connected) {
-  //     hasToken
-  //       ? (socket.io.opts.query = { userId: userId })
-  //       : (socket.io.opts.query = { userId: guestId });
-  //     socket.connect();
-  //   }
-
-  //   const reader = new FileReader();
-  //   reader.onload = (e) => {
-  //     const base64 = e.target?.result;
-  //     if (!base64 || typeof base64 !== "string") {
-  //       console.error("Failed to read file as base64");
-  //       return;
-  //     }
-  //     const newFile: IImage = {
-  //       base64: base64,
-  //       originalImageFile: "",
-  //       compressedImageFile: "",
-  //       fileName: file?.name,
-  //       imageId: "",
-  //       progress: 0,
-  //       done: false,
-  //     };
-  //     setImage((prev) => [...prev, newFile]);
-  //     console.log("base64", base64);
-  //     socket.emit("authentication", {
-  //       base64Image: base64,
-  //       fileName: file?.name,
-  //     });
-  //   };
-  //   reader.readAsDataURL(file);
-  // };
-
   const handleImageDrop = async (file: File) => {
     const fileSizeMB = file.size / 1024 / 1024;
     const maxFileSizeMB = parseFloat(
@@ -163,24 +127,6 @@ export default function Home() {
     socket.auth.token = "";
     router.push("/");
   };
-
-  // const compressHandler = (
-  //   imageId: string,
-  //   originalImageFile: string,
-  //   base64: string,
-  //   fileName: string
-  // ) => {
-  //   console.log("clicked", imageId, originalImageFile);
-  //   setIsUploadComplete(false);
-  //   socket.emit("startCompression", {
-  //     base64Image: base64,
-  //     fileName: fileName,
-  //     uploadedFileId: imageId,
-  //     originalUrl: originalImageFile,
-  //     compressionValue: compressionValue,
-  //   });
-  //   setIsClicked(true);
-  // };
 
   const compressHandler = async (imageId: string) => {
     if (!socket.connected) {
