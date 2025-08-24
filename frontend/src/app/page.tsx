@@ -16,6 +16,7 @@ import {
   useUploadImageMutation,
 } from "@/redux/services/api";
 import imageCompression from "browser-image-compression";
+import { format } from "path";
 
 export default function Home() {
   const router = useRouter();
@@ -67,10 +68,13 @@ export default function Home() {
         useWebWorker: true,
       });
     }
+    const uniqueId = crypto.randomUUID();
     const formData = new FormData();
     formData.append("image", fileToUpload);
+    formData.append("trackingId", uniqueId);
     const newFile: IImage = {
       rawFile: fileToUpload,
+      trackingId: uniqueId,
       originalImageFile: "",
       compressedImageFile: "",
       fileName: fileToUpload?.name,

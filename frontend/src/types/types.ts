@@ -1,5 +1,6 @@
 export interface IImage {
   rawFile: File;
+  trackingId: string;
   originalImageFile: string;
   compressedImageFile: string;
   fileName: string;

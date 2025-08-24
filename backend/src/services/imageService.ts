@@ -1,7 +1,7 @@
 import { getRabbitChannel } from "../config/rabbitMq";
 import HTTP_STATUS from "../constants/statusCode";
 import imageRepository from "../repositories/imageRepository";
-import { IImage, IFile } from "../types";
+import { IImage, IFile, IUploadPayload } from "../types";
 import AppError from "../utils/AppError";
 import { generateToken } from "../utils/common";
 import { Messages } from "../utils/messages";
@@ -114,8 +114,8 @@ class ImageService {
 
   public async uploadImage(
     file: any,
-    userId?: mongoose.Types.ObjectId,
-    payload?: any
+    payload: IUploadPayload,
+    userId?: mongoose.Types.ObjectId
   ) {
     try {
       if (!file) {
@@ -131,13 +131,15 @@ class ImageService {
         uploadImage = await imageRepository.uploadImageAsUser(
           userId,
           originalname,
-          imageUrl
+          imageUrl,
+          payload.trackingId
         );
       } else {
         uploadImage = await imageRepository.uploadImageAsGuest(
           payload.guestId,
           originalname,
-          imageUrl
+          imageUrl,
+          payload.trackingId
         );
       }
       if (!uploadImage) {

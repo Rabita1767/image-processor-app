@@ -6,25 +6,29 @@ class ImageRepository {
   public async uploadImageAsGuest(
     userId: string | undefined,
     fileName: any,
-    originalImageUrl: string
+    originalImageUrl: string,
+    trackingId: string
   ): Promise<IImage> {
     return await ImageModel.create({
       guestId: userId,
       filename: fileName,
       originalImageUrl: originalImageUrl,
+      trackingId: trackingId,
     });
   }
 
   public async uploadImageAsUser(
     userId: mongoose.Types.ObjectId,
     fileName: any,
-    originalImageUrl: string
+    originalImageUrl: string,
+    trackingId: string
   ): Promise<IImage> {
     console.log("enterr", userId);
     return await ImageModel.create({
       user: userId,
       filename: fileName,
       originalImageUrl: originalImageUrl,
+      trackingId: trackingId,
     });
   }
 

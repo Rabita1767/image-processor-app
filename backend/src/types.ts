@@ -68,3 +68,7 @@ export interface IImagePayload {
 interface ErrorWithStatus extends Error {
   status?: number;
 }
+export interface IUploadPayload {
+  guestId?: string;
+  trackingId: string;
+}

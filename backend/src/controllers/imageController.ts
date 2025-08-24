@@ -83,8 +83,8 @@ class ImageController {
     try {
       const uploadImage = await imageService.uploadImage(
         req.file,
-        req.userId || undefined,
-        req.body || {}
+        req.body || {},
+        req.userId || undefined
       );
       return sendResponse(
         res,
