@@ -9,6 +9,12 @@ router.post(
   upload.single("image"),
   imageController.uploadImage
 );
+router.post(
+  "/uploadImage",
+  authMiddleware.auth,
+  upload.array("images"),
+  imageController.bulkUploadImage
+);
 router.get("/download/:url", imageController.downloadProcessedImage);
 router.get("/:id", authMiddleware.auth, imageController.getImageById);
 router.get(

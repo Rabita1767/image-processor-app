@@ -98,6 +98,29 @@ class ImageController {
     }
   }
 
+  public async bulkUploadImage(
+    req: CustomRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const bulkUploadImage = await imageService.bulkUploadImage(
+        req.files,
+        req.userId || undefined,
+        req.body || {}
+      );
+      return sendResponse(
+        res,
+        HTTP_STATUS.OK,
+        Messages.IMAGE_UPLOADED_SUCCESSFULLY,
+        bulkUploadImage
+      );
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
   public async compressImage(
     req: CustomRequest,
     res: Response,

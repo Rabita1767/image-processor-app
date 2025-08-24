@@ -156,6 +156,61 @@ class ImageService {
     }
   }
 
+  public async bulkUploadImage(
+    files: any,
+    userId?: mongoose.Types.ObjectId,
+    payload?: any
+  ) {
+    try {
+      if (!files || !Array.isArray(files)) {
+        throw new AppError(
+          Messages.PLEASE_UPLOAD_FILES,
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
+      const uploadedToCloudinary = await Promise.all(
+        files.map((file) =>
+          uploadToCloudinaryFromBuffer(file.buffer, file.originalname)
+        )
+      );
+
+      let imageDocs;
+      let uploadImages;
+      if (userId) {
+        imageDocs = uploadedToCloudinary.map((url, index) => {
+          return {
+            user: userId,
+            filename: files[index].originalname,
+            originalImageUrl: url,
+          };
+        });
+        uploadImages = await imageRepository.bulkUploadImage(imageDocs);
+      } else {
+        imageDocs = uploadedToCloudinary.map((url, index) => {
+          return {
+            guestId: payload.guestId,
+            filename: files[index].originalname,
+            originalImageUrl: url,
+          };
+        });
+        uploadImages = await imageRepository.bulkUploadImage(imageDocs);
+      }
+      if (!uploadImages) {
+        throw new AppError(
+          Messages.ERROR_UPLOADING_IMAGE,
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
+      return uploadImages;
+    } catch (error) {
+      console.log(error);
+      throw new AppError(
+        Messages.ERROR_UPLOADING_IMAGE,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   public async compressImage(
     params: any,
     payload: any,

@@ -17,11 +17,17 @@ const getToken = () => {
   }
 };
 
+const loggedInUser = () => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("userId");
+  }
+};
+
 const socket = io(process.env.NEXT_PUBLIC_BASE_URL, {
   autoConnect: false,
   transports: ["websocket"],
   query: {
-    userId: getOrCreateGuestId() || "guest",
+    userId: loggedInUser() ?? getOrCreateGuestId(),
   },
   auth: {
     token: getToken() || "",

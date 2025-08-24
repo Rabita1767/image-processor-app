@@ -1,6 +1,7 @@
 import mongoose, { Mongoose, Types } from "mongoose";
 import ImageModel from "../models/imageModel";
 import { IFile, IImage } from "../types";
+import imageModel from "../models/imageModel";
 class ImageRepository {
   public async uploadImageAsGuest(
     userId: string | undefined,
@@ -65,6 +66,10 @@ class ImageRepository {
 
   public async findImage(userId: mongoose.Types.ObjectId, imageId: string) {
     return await ImageModel.findOne({ _id: imageId, user: userId });
+  }
+
+  public async bulkUploadImage(imageDocs: any) {
+    return await imageModel.insertMany(imageDocs);
   }
 }
 export default new ImageRepository();

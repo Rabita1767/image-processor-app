@@ -247,7 +247,10 @@ export default function Home() {
   useEffect(() => {
     const guestId = localStorage.getItem("guestId") || "guest";
     setGuestId(guestId);
+    console.log("whyyy");
   }, []);
+
+  console.log("hdehgd", guestId);
 
   useEffect(() => {
     if (!isSuccess) return;
@@ -266,20 +269,13 @@ export default function Home() {
       });
     });
   }, [isSuccess]);
+  console.log("ehdwd", hasToken);
 
   useEffect(() => {
     if (!isCompressionSuccess) return;
   }, [isCompressionSuccess]);
 
-  useEffect(() => {
-    if (!socket.connected) {
-      hasToken
-        ? (socket.io.opts.query = { userId: userId })
-        : (socket.io.opts.query = { userId: guestId });
-      socket.connect();
-    }
-  }, []);
-
+  console.log("iiiiiii", socket.io.opts.query);
   return (
     <div className="flex flex-col items-center justify-center w-full bg-white p-12 relative">
       <Header logoutHandler={handleLogout} hasToken={hasToken} isHomePage />
