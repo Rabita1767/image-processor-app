@@ -68,6 +68,16 @@ export const api = createApi({
         body: formData,
       }),
     }),
+
+    // Bulk upload images (reauth required)
+    bulkUploadImage: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: "/image/bulkUploadImage",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+
     // compressImage (reauth required)
     compressImage: builder.mutation<any, { imageId: string; payload: any }>({
       query: ({ imageId, payload }) => ({
@@ -86,4 +96,5 @@ export const {
   useGetUserImagesQuery,
   useUploadImageMutation,
   useCompressImageMutation,
+  useBulkUploadImageMutation,
 } = api;

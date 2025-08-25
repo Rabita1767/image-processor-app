@@ -106,8 +106,8 @@ class ImageController {
     try {
       const bulkUploadImage = await imageService.bulkUploadImage(
         req.files,
-        req.userId || undefined,
-        req.body || {}
+        req.body || {},
+        req.userId || undefined
       );
       return sendResponse(
         res,

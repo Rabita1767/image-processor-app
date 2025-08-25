@@ -160,8 +160,8 @@ class ImageService {
 
   public async bulkUploadImage(
     files: any,
-    userId?: mongoose.Types.ObjectId,
-    payload?: any
+    payload: IUploadPayload,
+    userId?: mongoose.Types.ObjectId
   ) {
     try {
       if (!files || !Array.isArray(files)) {
@@ -184,6 +184,7 @@ class ImageService {
             user: userId,
             filename: files[index].originalname,
             originalImageUrl: url,
+            trackingId: payload.trackingId,
           };
         });
         uploadImages = await imageRepository.bulkUploadImage(imageDocs);
@@ -193,6 +194,7 @@ class ImageService {
             guestId: payload.guestId,
             filename: files[index].originalname,
             originalImageUrl: url,
+            trackingId: payload.trackingId,
           };
         });
         uploadImages = await imageRepository.bulkUploadImage(imageDocs);

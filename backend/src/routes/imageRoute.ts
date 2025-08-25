@@ -10,9 +10,9 @@ router.post(
   imageController.uploadImage
 );
 router.post(
-  "/uploadImage",
+  "/bulkUploadImage",
   authMiddleware.auth,
-  upload.array("images"),
+  upload.array("images", 10),
   imageController.bulkUploadImage
 );
 router.get("/download/:url", imageController.downloadProcessedImage);

@@ -10,3 +10,14 @@ export interface IImage {
   done: boolean;
   hasCompressionStarted: boolean;
 }
+
+export interface IImageResponse {
+  _id: string;
+  user?: string;
+  guestId?: string;
+  trackingId: string;
+  filename: string;
+  originalImageUrl: string;
+  processedImageUrl?: string;
+  status: "pending" | "processing" | "done" | "failed";
+}

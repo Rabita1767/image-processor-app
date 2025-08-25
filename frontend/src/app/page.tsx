@@ -1,22 +1,24 @@
 "use client";
-import DragAndDrop from "@/components/molecules/dragAndDrop/dragAndDrop";
+import DragAndDrop from "@/components/organisms/dragAndDrop/dragAndDrop";
 import ImagePreview from "@/components/molecules/imagePreview/imagePreview";
 import exampleImage from "@/app/assets/images/upload.png";
 import { useEffect, useState } from "react";
 import socket from "@/socket/socket";
-import { IImage } from "@/types/types";
+import { IImage, IImageResponse } from "@/types/types";
 import { useRouter } from "next/navigation";
 import Header from "@/components/molecules/header/header";
-import LeftHeader from "@/components/leftHeader/leftHeader";
+import LeftHeader from "@/components/atoms/leftHeader/leftHeader";
 import { toast } from "react-toastify";
 import CompressionSlider from "@/components/molecules/compressionSlider/compressionSlider";
-import { getUserIdFromToken } from "@/utils/util";
+import { getUserIdFromToken, normalizeFilename } from "@/utils/util";
 import {
   useCompressImageMutation,
   useUploadImageMutation,
+  useBulkUploadImageMutation,
 } from "@/redux/services/api";
 import imageCompression from "browser-image-compression";
 import { format } from "path";
+import build from "next/dist/build";
 
 export default function Home() {
   const router = useRouter();
@@ -29,10 +31,21 @@ export default function Home() {
   const [compressionValue, setCompressionValue] = useState<number>(50);
   const [isDrop, setIsDrop] = useState<boolean>(false);
   const [userId, setUserId] = useState("");
+  const [active, setActive] = useState(0);
+  const [bulkImages, setBulkImages] = useState<any>([]);
   const [
     uploadImage,
     { data: uploadedImageData, isSuccess, isLoading, isError, error },
   ] = useUploadImageMutation();
+  const [
+    bulkUploadImage,
+    {
+      data: bulkUploadImageData,
+      isSuccess: isBulkUploadImageSuccess,
+      isLoading: isBulkUoloadImageLoading,
+      isError: isBulkUploadImageError,
+    },
+  ] = useBulkUploadImageMutation();
   const [
     compressImage,
     {
@@ -44,6 +57,9 @@ export default function Home() {
   ] = useCompressImageMutation();
 
   const handleImageDrop = async (file: File) => {
+    if (Array.isArray(file)) {
+      console.error("cant upload more than one file");
+    }
     const fileSizeMB = file.size / 1024 / 1024;
     const maxFileSizeMB = parseFloat(
       process.env.NEXT_PUBLIC_MAX_FILE_SIZE_MB || "0"
@@ -90,6 +106,73 @@ export default function Home() {
     } else {
       formData.append("guestId", guestId);
       await uploadImage(formData);
+    }
+  };
+
+  const handleBulkImageDrop = async (files: File[]) => {
+    if (!files || !Array.isArray(files)) {
+      toast.error("Something went wrong!Try again");
+      return;
+    }
+    if (files.length > 10) {
+      toast.error("Can't upload more than 10 files at once!");
+      return;
+    }
+    const maxFileSizeMB = parseFloat(
+      process.env.NEXT_PUBLIC_MAX_FILE_SIZE_MB || "0"
+    );
+    const thresholdFileSize = parseFloat(
+      process.env.NEXT_PUBLIC_PRECOMPRESS_THRESHOLD_MB || "0"
+    );
+    const formData = new FormData();
+    const uniqueId = crypto.randomUUID();
+    for (let i = 0; i < files.length; i++) {
+      const fileSizeMB = files[i].size / 1024 / 1024;
+      if (fileSizeMB > maxFileSizeMB) {
+        toast.error(
+          `File too large! Maximum allowed size is ${maxFileSizeMB} MB.`
+        );
+        return;
+      }
+      let fileToUpload = files[i];
+
+      if (fileSizeMB > thresholdFileSize) {
+        fileToUpload = await imageCompression(files[i], {
+          maxSizeMB: thresholdFileSize,
+          maxWidthOrHeight: 5000,
+          useWebWorker: true,
+        });
+      }
+      fileToUpload = normalizeFilename(fileToUpload);
+      formData.append("images", fileToUpload);
+      setImage((prev) => [
+        ...prev,
+        {
+          rawFile: fileToUpload,
+          trackingId: uniqueId,
+          originalImageFile: "",
+          compressedImageFile: "",
+          fileName: fileToUpload.name,
+          imageId: "",
+          uploadProgress: 0,
+          compressProgress: 0,
+          done: false,
+          hasCompressionStarted: false,
+        },
+      ]);
+    }
+    formData.append("trackingId", uniqueId);
+    if (!userId) formData.append("guestId", guestId);
+    const response = await bulkUploadImage(formData);
+  };
+
+  const handleFilesDrop = async (files: File[]) => {
+    if (active === 0) {
+      // Single image mode
+      if (files[0]) await handleImageDrop(files[0]);
+    } else {
+      // Bulk mode
+      await handleBulkImageDrop(files);
     }
   };
 
@@ -172,7 +255,6 @@ export default function Home() {
     socket.on("notification", (data) => {
       setIsCompressionDone(true);
       setIsClicked(false);
-      console.log("Got notification:", data);
       if (data?.message) {
         toast.success(data?.message);
       }
@@ -251,17 +333,15 @@ export default function Home() {
   useEffect(() => {
     const guestId = localStorage.getItem("guestId") || "guest";
     setGuestId(guestId);
-    console.log("whyyy");
   }, []);
-
-  console.log("hdehgd", guestId);
 
   useEffect(() => {
     if (!isSuccess) return;
     setImage((prev) => {
       if (prev.length === 0) return prev;
       return prev.map((img, index) => {
-        return index === prev.length - 1
+        return img.trackingId === uploadedImageData?.data?.trackingId ||
+          img.trackingId === bulkUploadImageData?.data?.trackingId
           ? {
               ...img,
               imageId: uploadedImageData?.data?._id,
@@ -273,13 +353,42 @@ export default function Home() {
       });
     });
   }, [isSuccess]);
-  console.log("ehdwd", hasToken);
 
   useEffect(() => {
     if (!isCompressionSuccess) return;
   }, [isCompressionSuccess]);
 
-  console.log("iiiiiii", socket.io.opts.query);
+  useEffect(() => {
+    if (!isBulkUploadImageSuccess || !bulkUploadImageData?.data) return;
+
+    const uploadedImages = bulkUploadImageData.data;
+
+    const uploadedMap = new Map<string, IImageResponse>(
+      uploadedImages.map((u: IImageResponse) => [
+        `${u.trackingId}-${u.filename}`,
+        u,
+      ])
+    );
+
+    setImage((prev: IImage[]) =>
+      prev.map((img) => {
+        const uploaded = uploadedMap.get(`${img.trackingId}-${img.fileName}`);
+
+        if (uploaded) {
+          return {
+            ...img,
+            imageId: uploaded._id,
+            originalImageFile: uploaded.originalImageUrl,
+            uploadProgress: 100,
+            done: true,
+          };
+        }
+
+        return img;
+      })
+    );
+  }, [isBulkUploadImageSuccess, bulkUploadImageData]);
+
   return (
     <div className="flex flex-col items-center justify-center w-full bg-white p-12 relative">
       <Header logoutHandler={handleLogout} hasToken={hasToken} isHomePage />
@@ -297,12 +406,14 @@ export default function Home() {
         </div>
         <DragAndDrop
           onInputChange={(value: string) => console.log("value", value)}
-          onDrop={handleImageDrop}
+          onDrop={handleFilesDrop}
           isCompressionDone={isCompressionDone}
           isUploadComplete={isUploadComplete}
           setIsUploadComplete={setIsUploadComplete}
           isDrop={isDrop}
           setIsDrop={setIsDrop}
+          active={active}
+          setActive={setActive}
         />
       </div>
 

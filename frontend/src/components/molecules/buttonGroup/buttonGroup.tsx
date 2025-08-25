@@ -1,8 +1,12 @@
 import Button from "@/components/atoms/button/button";
-import { useState } from "react";
+import React, { useState } from "react";
 
-const ButtonGroup = () => {
-  const [active, setActive] = useState(0);
+interface IButtonGroupProps {
+  active: number;
+  setActive: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const ButtonGroup: React.FC<IButtonGroupProps> = ({ active, setActive }) => {
   return (
     <div className="flex flex-row w-full gap-[2px] bg-lightBlue justify-between rounded">
       <Button

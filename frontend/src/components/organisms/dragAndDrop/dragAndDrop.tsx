@@ -1,17 +1,19 @@
 "use client";
 import Input from "@/components/atoms/input/input";
 import { useEffect, useState } from "react";
-import ButtonGroup from "../buttonGroup/buttonGroup";
+import ButtonGroup from "../../molecules/buttonGroup/buttonGroup";
 import { Upload, Check, CheckCircle } from "lucide-react";
 import socket from "@/socket/socket";
 interface IDragAndDrop {
   onInputChange: (value: string) => void;
-  onDrop: (file: File) => void;
+  onDrop: (files: File[]) => Promise<void>;
   isCompressionDone: boolean;
   isUploadComplete: boolean;
   setIsUploadComplete: React.Dispatch<React.SetStateAction<boolean>>;
   isDrop: boolean;
   setIsDrop: React.Dispatch<React.SetStateAction<boolean>>;
+  active: number;
+  setActive: React.Dispatch<React.SetStateAction<number>>;
 }
 const DragAndDrop: React.FC<IDragAndDrop> = ({
   onInputChange,
@@ -21,12 +23,20 @@ const DragAndDrop: React.FC<IDragAndDrop> = ({
   setIsUploadComplete,
   isDrop,
   setIsDrop,
+  active,
+  setActive,
 }) => {
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (
+    e: React.DragEvent<HTMLDivElement>,
+    active: number
+  ) => {
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      onDrop(file);
+    const files = Array.from(e.dataTransfer.files);
+
+    if (active === 0 && files[0]) {
+      await onDrop([files[0]]);
+    } else if (active === 1) {
+      await onDrop(files);
     }
   };
 
@@ -46,11 +56,11 @@ const DragAndDrop: React.FC<IDragAndDrop> = ({
   return (
     <div className="flex flex-col gap-4 w-[50%] p-4">
       <p className="text-primary text-[24px] font-bold">Compress Your Images</p>
-      <ButtonGroup />
+      <ButtonGroup active={active} setActive={setActive} />
       <p className="text-primary text-[16px]">Upload Image</p>
       <div
         className="border-1 border-dashed border-primary h-[400px] flex flex-col justify-center items-center cursor-pointer rounded-lg"
-        onDrop={handleDrop}
+        onDrop={(e) => handleDrop(e, active)}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
       >
