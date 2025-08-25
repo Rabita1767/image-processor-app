@@ -62,12 +62,12 @@ const Login = () => {
     <div className="h-screen flex flex-col p-8 gap-10 ">
       <Header />
       <div>
-        <h1 className="text-center text-2xl font-bold my-2 text-primary">
+        <h1 className="text-center text-[20px] tab:text-2xl font-bold my-2 text-primary">
           Login
         </h1>
         <form
           onSubmit={handleRegistration}
-          className="flex flex-col max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-lightBlue rounded-lg"
+          className="flex flex-col max-w-full tab:max-w-[60%] pc:max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-lightBlue rounded-lg"
         >
           <div>
             <p>Email</p>

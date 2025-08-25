@@ -7,7 +7,9 @@ const LeftHeader = () => {
       <div className="flex justify-center items-center">
         <ChevronLeft className="w-6 h-6 text-primary" />
       </div>
-      <p className="text-primary text-[24px] font-bold">Compression Options</p>
+      <p className="text-primary text-[18px] tab:text-[24px] font-bold">
+        Compression Options
+      </p>
     </div>
   );
 };

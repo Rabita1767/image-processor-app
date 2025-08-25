@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import clsx from "clsx";
 
 interface IInput {
@@ -6,33 +6,31 @@ interface IInput {
   type?: string;
   value?: string;
   isRequired?: boolean;
-  onChange: (value: string) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
 }
 
-const Input: React.FC<IInput> = ({
-  className,
-  type = "text",
-  value,
-  isRequired,
-  onChange,
-  placeholder,
-}) => {
-  return (
-    <div>
+const Input = forwardRef<HTMLInputElement, IInput>(
+  (
+    { className, type = "text", value, isRequired, onChange, placeholder },
+    ref
+  ) => {
+    return (
       <input
+        ref={ref}
         className={clsx(
           "px-3 py-2 border-[2px] border-lightBlue rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
           className
         )}
         type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange}
         required={isRequired}
         placeholder={placeholder}
       />
-    </div>
-  );
-};
+    );
+  }
+);
+Input.displayName = "Input";
 
 export default Input;

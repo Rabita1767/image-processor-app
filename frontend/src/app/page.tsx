@@ -210,7 +210,7 @@ export default function Home() {
     socket.disconnect();
     socket.io.opts.query = { userId: guestId };
     socket.auth.token = "";
-    router.push("/");
+    window.location.href = "/";
   };
 
   const compressHandler = async (imageId: string) => {
@@ -390,10 +390,10 @@ export default function Home() {
   }, [isBulkUploadImageSuccess, bulkUploadImageData]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full bg-white p-12 relative">
+    <div className="flex flex-col items-center justify-center w-full bg-white p-4 tab:p-12 relative">
       <Header logoutHandler={handleLogout} hasToken={hasToken} isHomePage />
-      <div className="w-full flex flex-row justify-between my-10">
-        <div className="flex flex-col gap-4 p-4 w-[45%] justify-between">
+      <div className="w-full flex flex-col-reverse pc:flex-row justify-between my-10">
+        <div className="flex flex-col gap-4 p-4 w-full pc:w-[45%] justify-between">
           <div>
             <LeftHeader />
             <CompressionSlider
@@ -405,7 +405,6 @@ export default function Home() {
           </div>
         </div>
         <DragAndDrop
-          onInputChange={(value: string) => console.log("value", value)}
           onDrop={handleFilesDrop}
           isCompressionDone={isCompressionDone}
           isUploadComplete={isUploadComplete}

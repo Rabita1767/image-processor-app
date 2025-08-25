@@ -14,6 +14,10 @@
   --color-lightBlue: var(--lightBlue);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --breakpoint-mobile: 360px;
+  --breakpoint-tab: 768px;
+  --breakpoint-pc: 1280px;
 }
 
 @media (prefers-color-scheme: dark) {

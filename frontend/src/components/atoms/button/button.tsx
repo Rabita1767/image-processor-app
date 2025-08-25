@@ -8,6 +8,7 @@ interface IButton {
   className?: string;
   icon?: ReactNode;
   isDisabled?: boolean;
+  isButtonGroup?: boolean;
 }
 
 const Button: React.FC<IButton> = ({
@@ -17,14 +18,17 @@ const Button: React.FC<IButton> = ({
   className,
   icon,
   isDisabled,
+  isButtonGroup,
 }) => {
   const buttonClass = clsx(
     "flex items-center justify-between gap-2",
-    "bg-blue-500 px-4 py-2 rounded transition-colors duration-300 font-semibold",
+    "bg-blue-500 px-4 rounded transition-colors duration-300 font-semibold",
     className,
     {
       "cursor-not-allowed opacity-50": isDisabled,
       "cursor-pointer": !isDisabled,
+      "py-0 tab:py-2": isButtonGroup,
+      "py-2": !isButtonGroup,
     }
   );
 

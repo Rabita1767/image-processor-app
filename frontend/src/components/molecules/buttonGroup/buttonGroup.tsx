@@ -15,9 +15,10 @@ const ButtonGroup: React.FC<IButtonGroupProps> = ({ active, setActive }) => {
         }}
         type="submit"
         btnText="Single Image"
-        className={`rounded w-full ${
+        className={`rounded w-full text-[14px] tab:text-[20px] ${
           active === 0 ? "bg-white shadow-md" : "bg-lightBlue"
         } text-primary m-[4px]`}
+        isButtonGroup
       />
       <Button
         onClick={() => {
@@ -25,9 +26,10 @@ const ButtonGroup: React.FC<IButtonGroupProps> = ({ active, setActive }) => {
         }}
         type="submit"
         btnText="Bulk Compression"
-        className={`rounded w-full ${
+        className={`rounded w-full text-[14px] tab:text-[20px] ${
           active === 1 ? "bg-white shadow-md" : "bg-lightBlue"
         } text-primary m-[4px]`}
+        isButtonGroup
       />
     </div>
   );

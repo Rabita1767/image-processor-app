@@ -24,7 +24,7 @@ const CompressionSlider: React.FC<CompressionSliderProps> = ({
 
   return (
     <div className="flex flex-col gap-2 w-full p-4 border border-lightBlue rounded-xl">
-      <label className="text-primary font-semibold">
+      <label className="text-[14px] tab:text-[18px] text-primary font-semibold">
         Compression: {value}%
       </label>
       <input
