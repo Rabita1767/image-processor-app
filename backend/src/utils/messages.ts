@@ -38,4 +38,5 @@ export const Messages = {
   PLEASE_UPLOAD_A_FILE: "Please upload a file",
   IMAGE_ID_REQUIRED: "Image Id is required",
   PLEASE_UPLOAD_FILES: "Please upload files",
+  LOGIN_SUCCESSFUL: "You have logged in successfully",
 };

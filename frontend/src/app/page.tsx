@@ -209,7 +209,7 @@ export default function Home() {
     setHasToken(false);
     socket.disconnect();
     socket.io.opts.query = { userId: guestId };
-    socket.auth.token = "";
+    socket.auth = { ...socket.auth, token: "" };
     window.location.href = "/";
   };
 
@@ -340,12 +340,12 @@ export default function Home() {
     setImage((prev) => {
       if (prev.length === 0) return prev;
       return prev.map((img, index) => {
-        return img.trackingId === uploadedImageData?.data?.trackingId ||
-          img.trackingId === bulkUploadImageData?.data?.trackingId
+        return img.trackingId === uploadedImageData?.result?.trackingId ||
+          img.trackingId === bulkUploadImageData?.result?.trackingId
           ? {
               ...img,
-              imageId: uploadedImageData?.data?._id,
-              originalImageFile: uploadedImageData?.data?.originalImageUrl,
+              imageId: uploadedImageData?.result?._id,
+              originalImageFile: uploadedImageData?.result?.originalImageUrl,
               uploadProgress: 100,
               done: true,
             }
@@ -353,15 +353,15 @@ export default function Home() {
       });
     });
   }, [isSuccess]);
-
+  console.log("im", image);
   useEffect(() => {
     if (!isCompressionSuccess) return;
   }, [isCompressionSuccess]);
 
   useEffect(() => {
-    if (!isBulkUploadImageSuccess || !bulkUploadImageData?.data) return;
+    if (!isBulkUploadImageSuccess || !bulkUploadImageData?.result) return;
 
-    const uploadedImages = bulkUploadImageData.data;
+    const uploadedImages = bulkUploadImageData.result;
 
     const uploadedMap = new Map<string, IImageResponse>(
       uploadedImages.map((u: IImageResponse) => [

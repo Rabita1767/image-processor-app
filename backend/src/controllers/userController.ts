@@ -34,7 +34,12 @@ class UserController {
         path: "/", // ensure cookie is sent to all routes
       });
 
-      return sendResponse(res, HTTP_STATUS.OK, Messages.CREATED, login);
+      return sendResponse(
+        res,
+        HTTP_STATUS.OK,
+        Messages.LOGIN_SUCCESSFUL,
+        login
+      );
     } catch (error) {
       next(error);
     }

@@ -14,14 +14,14 @@ const Registration = () => {
   const [password, setPassword] = useState<string>("");
   const [signup, { isLoading, isSuccess, isError, error }] =
     useSignupMutation();
-  const handleUserName = (value: string) => {
-    setUserName(value);
+  const handleUserName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserName(e.target.value);
   };
-  const handleEmail = (value: string) => {
-    setEmail(value);
+  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
   };
-  const handlePassword = (value: string) => {
-    setPassword(value);
+  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
   };
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,4 +1,5 @@
 import socket from "@/socket/socket";
+import { IRefreshResponse } from "@/types/types";
 import { getUserIdFromToken } from "@/utils/util";
 import {
   fetchBaseQuery,
@@ -32,14 +33,15 @@ export const baseQueryWithReauth: BaseQueryFn<
       api,
       extraOptions
     );
-
-    if (refreshResult.data) {
-      const newAccessToken = (refreshResult.data as { data: string }).data;
+    const refreshData = refreshResult.data as IRefreshResponse | undefined;
+    console.log("newAccessToken", refreshData?.result);
+    if (refreshData) {
+      const newAccessToken = refreshData.result;
       const userId = getUserIdFromToken(newAccessToken);
       localStorage.setItem("accessToken", newAccessToken);
       if (socket && socket.connected) {
         socket.io.opts.query = { userId: userId };
-        socket.auth.token = newAccessToken;
+        socket.auth = { ...socket.auth, token: newAccessToken };
 
         socket.disconnect();
         socket.connect();

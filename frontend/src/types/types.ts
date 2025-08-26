@@ -1,3 +1,12 @@
+export interface IError {
+  errors: {
+    type: string;
+    value: string;
+    msg: string;
+    path: string;
+    location: string;
+  }[];
+}
 export interface IImage {
   rawFile: File;
   trackingId: string;
@@ -20,4 +29,28 @@ export interface IImageResponse {
   originalImageUrl: string;
   processedImageUrl?: string;
   status: "pending" | "processing" | "done" | "failed";
+}
+export interface IUser {
+  _id: string;
+  email: string;
+  userName: string;
+}
+export interface ILoginData {
+  accessToken: string;
+  refreshToken: string;
+  user: IUser;
+}
+
+export interface ILoginResponse {
+  success: boolean;
+  message: string;
+  error: IError | null;
+  result: ILoginData;
+}
+
+export interface IRefreshResponse {
+  success: boolean;
+  message: string;
+  result: string;
+  error: IError | null;
 }

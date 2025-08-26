@@ -19,7 +19,7 @@ export const sendResponse = (
   const response: Partial<ApiResponse> = {
     success: status < 400,
     message: message,
-    data: result,
+    result: null,
     error: null,
   } as ApiResponse;
   if (status >= 400) {
@@ -28,7 +28,7 @@ export const sendResponse = (
     response.message = "Internal server error";
   } else {
     response.success = true;
-    response.data = result;
+    response.result = result;
     response.message = "Successfully completed operations";
   }
 

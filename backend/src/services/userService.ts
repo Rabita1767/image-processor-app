@@ -42,7 +42,11 @@ class UserService {
     }
     const { refreshToken, accessToken } = await generateToken(findUser);
     return {
-      user: findUser,
+      user: {
+        _id:findUser._id,
+        userName:findUser.userName,
+        email:findUser.email,
+      },
       accessToken,
       refreshToken,
     };

@@ -17,11 +17,11 @@ const Login = () => {
   const [login, { data, isLoading, isSuccess, isError, error }] =
     useLoginMutation();
 
-  const handleEmail = (value: string) => {
-    setEmail(value);
+  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
   };
-  const handlePassword = (value: string) => {
-    setPassword(value);
+  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
   };
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,11 +35,11 @@ const Login = () => {
     if (!isSuccess) return;
     socket.disconnect();
 
-    localStorage.setItem("accessToken", data?.data?.accessToken);
-    if (data?.data?.accessToken) {
-      const userId = getUserIdFromToken(data?.data?.accessToken);
+    if (data?.result?.accessToken) {
+      const userId = getUserIdFromToken(data?.result?.accessToken);
+      console.log("kii", userId);
       socket.io.opts.query = { userId: userId };
-      socket.auth.token = data?.data?.accessToken;
+      socket.auth = { ...socket.auth, token: data?.result?.accessToken };
       socket.connect();
       localStorage.setItem("userId", userId || "");
       // localStorage.removeItem("guestId");
@@ -57,6 +57,8 @@ const Login = () => {
     setEmail("");
     setPassword("");
   }, [isError, error]);
+
+  console.log("klo", data);
 
   return (
     <div className="h-screen flex flex-col p-8 gap-10 ">

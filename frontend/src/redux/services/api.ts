@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery, baseQueryWithReauth } from "./baseQuery"; // no reauth
+import { ILoginResponse } from "@/types/types";
 
 export const api = createApi({
   reducerPath: "api",
@@ -46,8 +47,11 @@ export const api = createApi({
           api,
           extraOptions
         );
-        if (response.data?.accessToken) {
-          localStorage.setItem("accessToken", response.data.accessToken);
+        const data = response.data as ILoginResponse;
+        console.log("kliiiii", data?.result?.accessToken);
+        if (data?.result?.accessToken) {
+          console.log("enteringgg");
+          localStorage.setItem("accessToken", data?.result?.accessToken);
         }
         return response;
       },

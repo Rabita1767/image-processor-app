@@ -1,16 +1,22 @@
-import mongoose, {
-  Document,
-  MongooseDistinctDocumentMiddleware,
-  Types,
-} from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 import { Request } from "express";
-export interface IUser extends Document {
+export interface IUser {
+  _id: mongoose.Types.ObjectId;
   userName: string;
   email: string;
   password: string;
 }
-
-export interface IImage extends Document {
+export interface IError {
+  errors: {
+    type: string;
+    value: string;
+    msg: string;
+    path: string;
+    location: string;
+  }[];
+}
+export interface IImage {
+  _id: mongoose.Types.ObjectId;
   user?: Types.ObjectId;
   guestId?: string;
   trackingId: string;
@@ -22,9 +28,9 @@ export interface IImage extends Document {
 
 export interface ApiResponse extends Document {
   success: boolean;
-  data: any;
+  result: any;
   message?: string;
-  error?: any;
+  error?: IError | null;
 }
 
 export interface IToken {
@@ -42,10 +48,12 @@ export interface IloginPayload {
   email: string;
   password: string;
 }
+
+export type safeUser = Omit<IUser, "password">;
 export interface ILoginResponse {
   accessToken: string;
   refreshToken: string;
-  user: IUser;
+  user: safeUser;
 }
 
 export interface CustomRequest extends Request {
