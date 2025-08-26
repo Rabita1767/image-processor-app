@@ -1,11 +1,11 @@
 "use client";
-import Button from "@/components/atoms/button/button";
-import Input from "@/components/atoms/input/input";
 import React, { useEffect, useState } from "react";
 import { useSignupMutation } from "@/redux/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import Header from "@/components/molecules/header/header";
+import LayoutTemplate from "@/components/templates/layoutTemplate";
+import RegistrationSection from "@/components/organisms/registrationSection/registrationsection";
+import { IRegistrationPayload } from "@/types/types";
 
 const Registration = () => {
   const router = useRouter();
@@ -14,25 +14,16 @@ const Registration = () => {
   const [password, setPassword] = useState<string>("");
   const [signup, { isLoading, isSuccess, isError, error }] =
     useSignupMutation();
-  const handleUserName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserName(e.target.value);
-  };
-  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-  const handleRegistration = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userName || !email || !password) {
-      alert("Please fill all fields");
+  const handleRegistration = async (data: IRegistrationPayload) => {
+    if (!data.userName || !data.email || !data.password) {
+      toast.error("Please fill all fields");
       return;
     }
-    await signup({ userName, email, password });
+    await signup(data);
   };
   useEffect(() => {
     if (isSuccess) {
+      toast.success("Account Registration Successful");
       router.push("/login");
       setUserName("");
       setEmail("");
@@ -54,61 +45,19 @@ const Registration = () => {
 
   return (
     <div className="h-screen flex flex-col p-8 gap-10">
-      <Header />
-      <div>
-        <h1 className="text-center text-[20px] tab:text-2xl font-bold my-4">
-          Registration
-        </h1>
-        <form
-          onSubmit={handleRegistration}
-          className="flex flex-col max-w-full tab:max-w-[60%] pc:max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-gray-300 rounded-lg"
-        >
-          <div>
-            <p>Username</p>
-            <Input
-              type="text"
-              onChange={handleUserName}
-              value={userName}
-              placeholder="Enter your username"
-              className="w-full mx-auto my-[8px]"
-              isRequired
-            />
-          </div>
-          <div>
-            <p>Email</p>
-            <Input
-              type="text"
-              onChange={handleEmail}
-              value={email}
-              placeholder="Enter your email"
-              className="w-full mx-auto my-[8px]"
-              isRequired
-            />
-          </div>
-          <div>
-            <p>Password</p>
-            <Input
-              type="password"
-              onChange={handlePassword}
-              value={password}
-              placeholder="Enter your password"
-              className="w-full mx-auto my-[8px]"
-              isRequired
-            />
-          </div>
-          <Button
-            btnText="Signup"
-            className="mt-[8px] bg-primary text-white text-center rounded-[24px]"
-            type="submit"
+      <LayoutTemplate
+        children={
+          <RegistrationSection
+            userName={userName}
+            setUserName={setUserName}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            onSubmit={handleRegistration}
           />
-          <p
-            className="text-center mt-[8px] cursor-pointer text-blue-500 hover:underline"
-            onClick={() => router.push("/login")}
-          >
-            Already have an account? Login
-          </p>
-        </form>
-      </div>
+        }
+      />
     </div>
   );
 };
