@@ -9,7 +9,7 @@ const UserImage = () => {
 
   useEffect(() => {
     if (!isSuccess) return;
-    setUserImageData(userImages?.data || []);
+    setUserImageData(userImages?.result || []);
   }, [isSuccess]);
 
   return (

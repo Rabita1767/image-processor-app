@@ -1,14 +1,14 @@
 "use client";
-import Button from "@/components/atoms/button/button";
-import Input from "@/components/atoms/input/input";
+
 import React, { useEffect, useState } from "react";
 import { useLoginMutation } from "@/redux/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { getUserIdFromToken } from "@/utils/util";
 import socket from "@/socket/socket";
-import Header from "@/components/molecules/header/header";
-import { Loader2 } from "lucide-react";
+import LoginSection from "@/components/organisms/loginSection/loginSection";
+import LayoutTemplate from "@/components/templates/layoutTemplate";
+import { IloginPayload } from "@/types/types";
 
 const Login = () => {
   const router = useRouter();
@@ -17,19 +17,12 @@ const Login = () => {
   const [login, { data, isLoading, isSuccess, isError, error }] =
     useLoginMutation();
 
-  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-  const handleRegistration = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-      alert("Please fill all fields");
+  const handleRegistration = async (data: IloginPayload) => {
+    if (!data.email || !data.password) {
+      toast.error("Please fill all fields");
       return;
     }
-    await login({ email, password });
+    await login(data);
   };
   useEffect(() => {
     if (!isSuccess) return;
@@ -48,6 +41,7 @@ const Login = () => {
 
   useEffect(() => {
     if (!isError) return;
+    console.log("errorrrr", error);
     if ("data" in error) {
       toast.error(
         (error.data as { message?: string })?.message || "Login failed"
@@ -57,47 +51,20 @@ const Login = () => {
     setPassword("");
   }, [isError, error]);
 
-
   return (
     <div className="h-screen flex flex-col p-8 gap-10 ">
-      <Header />
-      <div>
-        <h1 className="text-center text-[20px] tab:text-2xl font-bold my-2 text-primary">
-          Login
-        </h1>
-        <form
-          onSubmit={handleRegistration}
-          className="flex flex-col max-w-full tab:max-w-[60%] pc:max-w-[45%] w-full mx-auto my-10 p-4 border-2 border-lightBlue rounded-lg"
-        >
-          <div>
-            <p>Email</p>
-            <Input
-              type="text"
-              onChange={handleEmail}
-              value={email}
-              placeholder="Enter your email"
-              className="w-full mx-auto my-[8px]"
-              isRequired
-            />
-          </div>
-          <div>
-            <p>Password</p>
-            <Input
-              type="password"
-              onChange={handlePassword}
-              value={password}
-              placeholder="Enter your password"
-              className="w-full mx-auto my-[8px]"
-              isRequired
-            />
-          </div>
-          <Button
-            btnText={isLoading ? <Loader2 /> : "Login"}
-            className="mt-[8px] bg-primary text-white rounded-[24px]"
-            type="submit"
+      <LayoutTemplate
+        children={
+          <LoginSection
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            onSubmit={handleRegistration}
+            isLoading={isLoading}
           />
-        </form>
-      </div>
+        }
+      />
     </div>
   );
 };

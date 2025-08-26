@@ -54,3 +54,7 @@ export interface IRefreshResponse {
   result: string;
   error: IError | null;
 }
+export interface IloginPayload {
+  email: string;
+  password: string;
+}

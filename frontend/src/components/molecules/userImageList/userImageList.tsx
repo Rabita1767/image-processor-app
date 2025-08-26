@@ -1,3 +1,6 @@
+import noData from "@/app/assets/images/no-data.png";
+import Image from "next/image";
+
 interface UserImageListProps {
   data: { originalImageUrl: string; filename: string }[];
 }
@@ -5,7 +8,7 @@ interface UserImageListProps {
 const UserImageList: React.FC<UserImageListProps> = ({ data }) => {
   return (
     <>
-      {data && data.length > 0 && (
+      {data && data.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 ">
           {data.map((image, index) => (
             <div key={index} className="border rounded-lg  shadow-md">
@@ -20,6 +23,10 @@ const UserImageList: React.FC<UserImageListProps> = ({ data }) => {
               </div>
             </div>
           ))}
+        </div>
+      ) : (
+        <div>
+          <Image src={noData} alt="No Data" />
         </div>
       )}
     </>
