@@ -20,7 +20,7 @@ export interface IImage {
   hasCompressionStarted: boolean;
 }
 
-export interface IImageResponse {
+export interface IImageData {
   _id: string;
   user?: string;
   guestId?: string;
@@ -62,4 +62,11 @@ export interface IRegistrationPayload {
   userName: string;
   email: string;
   password: string;
+}
+
+export interface IUserImagesResponse {
+  success: boolean;
+  message: string;
+  result: IImageData[];
+  error: IError | null;
 }

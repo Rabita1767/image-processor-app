@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery, baseQueryWithReauth } from "./baseQuery"; // no reauth
-import { ILoginResponse } from "@/types/types";
+import { ILoginResponse, IUserImagesResponse } from "@/types/types";
 
 export const api = createApi({
   reducerPath: "api",
@@ -56,7 +56,7 @@ export const api = createApi({
     }),
 
     // Get user images (reauth required)
-    getUserImages: builder.query<any, void>({
+    getUserImages: builder.query<IUserImagesResponse, void>({
       query: () => ({
         url: "/image/get/userImages",
         method: "GET",

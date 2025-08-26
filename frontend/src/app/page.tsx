@@ -4,7 +4,7 @@ import ImagePreview from "@/components/molecules/imagePreview/imagePreview";
 import exampleImage from "@/app/assets/images/upload.png";
 import { useEffect, useState } from "react";
 import socket from "@/socket/socket";
-import { IImage, IImageResponse } from "@/types/types";
+import { IImage, IImageData } from "@/types/types";
 import { useRouter } from "next/navigation";
 import Header from "@/components/molecules/header/header";
 import LeftHeader from "@/components/atoms/leftHeader/leftHeader";
@@ -362,8 +362,8 @@ export default function Home() {
 
     const uploadedImages = bulkUploadImageData.result;
 
-    const uploadedMap = new Map<string, IImageResponse>(
-      uploadedImages.map((u: IImageResponse) => [
+    const uploadedMap = new Map<string, IImageData>(
+      uploadedImages.map((u: IImageData) => [
         `${u.trackingId}-${u.filename}`,
         u,
       ])
