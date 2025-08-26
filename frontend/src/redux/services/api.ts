@@ -48,9 +48,7 @@ export const api = createApi({
           extraOptions
         );
         const data = response.data as ILoginResponse;
-        console.log("kliiiii", data?.result?.accessToken);
         if (data?.result?.accessToken) {
-          console.log("enteringgg");
           localStorage.setItem("accessToken", data?.result?.accessToken);
         }
         return response;

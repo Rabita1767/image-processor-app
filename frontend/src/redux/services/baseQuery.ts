@@ -34,7 +34,6 @@ export const baseQueryWithReauth: BaseQueryFn<
       extraOptions
     );
     const refreshData = refreshResult.data as IRefreshResponse | undefined;
-    console.log("newAccessToken", refreshData?.result);
     if (refreshData) {
       const newAccessToken = refreshData.result;
       const userId = getUserIdFromToken(newAccessToken);

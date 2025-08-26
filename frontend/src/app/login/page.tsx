@@ -37,7 +37,6 @@ const Login = () => {
 
     if (data?.result?.accessToken) {
       const userId = getUserIdFromToken(data?.result?.accessToken);
-      console.log("kii", userId);
       socket.io.opts.query = { userId: userId };
       socket.auth = { ...socket.auth, token: data?.result?.accessToken };
       socket.connect();
@@ -58,7 +57,6 @@ const Login = () => {
     setPassword("");
   }, [isError, error]);
 
-  console.log("klo", data);
 
   return (
     <div className="h-screen flex flex-col p-8 gap-10 ">

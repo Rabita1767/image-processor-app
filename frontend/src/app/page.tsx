@@ -353,7 +353,6 @@ export default function Home() {
       });
     });
   }, [isSuccess]);
-  console.log("im", image);
   useEffect(() => {
     if (!isCompressionSuccess) return;
   }, [isCompressionSuccess]);
