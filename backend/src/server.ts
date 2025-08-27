@@ -22,8 +22,20 @@ const io = new Server(server, {
   maxHttpBufferSize: 5e6,
 });
 
-const pubClient = new Redis();
+const REDIS_URL = process.env.REDIS_URL;
+if (!REDIS_URL) {
+  throw new Error("REDIS_URL is not defined");
+}
+
+const pubClient = new Redis(REDIS_URL, {
+  tls: {
+    rejectUnauthorized: false, // allow Upstash SSL
+  },
+});
 const subClient = pubClient.duplicate();
+
+pubClient.on("error", (err) => console.error("Redis Pub Client Error:", err));
+subClient.on("error", (err) => console.error("Redis Sub Client Error:", err));
 
 io.adapter(createAdapter(pubClient, subClient));
 

@@ -13,49 +13,49 @@ const socketGateway = async (socket: Socket) => {
   console.log("userId", userId);
   console.log("New client connected", socket.id);
 
-  socket.on("authentication", async (data) => {
-    try {
-      socket.join(userId);
-      console.log("User uploaded data", data);
-      const base64Data = data?.base64Image.replace(
-        /^data:image\/\w+;base64,/,
-        ""
-      );
-      const buffer = Buffer.from(base64Data, "base64");
+  // socket.on("authentication", async (data) => {
+  //   try {
+  //     socket.join(userId);
+  //     console.log("User uploaded data", data);
+  //     const base64Data = data?.base64Image.replace(
+  //       /^data:image\/\w+;base64,/,
+  //       ""
+  //     );
+  //     const buffer = Buffer.from(base64Data, "base64");
 
-      const originalUrl = await uploadToCloudinaryFromBuffer(
-        buffer,
-        data.fileName || "uploaded_image"
-      );
-      let uploadImage;
-      if (!token) {
-        uploadImage = await imageRepository.uploadImageAsGuest(
-          userId as string,
-          data?.fileName,
-          originalUrl
-        );
-      } else {
-        uploadImage = await imageRepository.uploadImageAsUser(
-          userId as string,
-          data?.fileName,
-          originalUrl
-        );
-      }
-      if (!uploadImage) {
-        console.error("Error saving image to database");
-        return socket.emit("upload-error", { error: "Failed to save image" });
-      }
+  //     const originalUrl = await uploadToCloudinaryFromBuffer(
+  //       buffer,
+  //       data.fileName || "uploaded_image"
+  //     );
+  //     let uploadImage;
+  //     if (!token) {
+  //       uploadImage = await imageRepository.uploadImageAsGuest(
+  //         userId as string,
+  //         data?.fileName,
+  //         originalUrl
+  //       );
+  //     } else {
+  //       uploadImage = await imageRepository.uploadImageAsUser(
+  //         userId as string,
+  //         data?.fileName,
+  //         originalUrl
+  //       );
+  //     }
+  //     if (!uploadImage) {
+  //       console.error("Error saving image to database");
+  //       return socket.emit("upload-error", { error: "Failed to save image" });
+  //     }
 
-      socket.emit("upload-success", {
-        message: "Image uploaded successfully",
-        imageUrl: originalUrl,
-        uploadedImgId: uploadImage._id,
-      });
-    } catch (err) {
-      console.error("Error uploading image:", err);
-      socket.emit("upload-error", { error: err.message });
-    }
-  });
+  //     socket.emit("upload-success", {
+  //       message: "Image uploaded successfully",
+  //       imageUrl: originalUrl,
+  //       uploadedImgId: uploadImage._id,
+  //     });
+  //   } catch (err) {
+  //     console.error("Error uploading image:", err);
+  //     socket.emit("upload-error", { error: err.message });
+  //   }
+  // });
 
   socket.emit("hello", {
     message: "Hello from the server!",
