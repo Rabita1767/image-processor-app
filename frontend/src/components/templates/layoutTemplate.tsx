@@ -27,7 +27,6 @@ const LayoutTemplate: React.FC<IlayoutProps> = ({
     socket.auth = { ...socket.auth, token: "" };
     window.location.href = "/";
   };
-
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {

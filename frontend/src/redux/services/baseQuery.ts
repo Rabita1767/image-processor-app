@@ -1,3 +1,4 @@
+"use client";
 import socket from "@/socket/socket";
 import { IRefreshResponse } from "@/types/types";
 import { getUserIdFromToken } from "@/utils/util";
