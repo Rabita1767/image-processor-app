@@ -28,8 +28,8 @@ class UserController {
       const login = await userService.login(req.body);
       res.cookie("refreshToken", login.refreshToken, {
         httpOnly: true,
-        secure: false, // false for localhost; true for production (HTTPS)
-        sameSite: "lax", // allows cookies on same site or top-level navigation
+        secure: true, // false for localhost; true for production (HTTPS)
+        sameSite: "none", // for cross-origin cookies
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/", // ensure cookie is sent to all routes
       });
