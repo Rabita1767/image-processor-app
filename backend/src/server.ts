@@ -59,6 +59,9 @@ app.use((req, res, next) => {
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/image", imageRoute);
 app.use("/api/v1/token", tokenRoute);
+app.get("/api/v1/user/ping", (req, res) => {
+  res.status(200).json({ message: "pong" });
+});
 app.use(errorHandler);
 
 export { server, io };
