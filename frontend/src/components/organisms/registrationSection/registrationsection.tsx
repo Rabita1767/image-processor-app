@@ -2,6 +2,7 @@ import Button from "@/components/atoms/button/button";
 import Input from "@/components/atoms/input/input";
 import { IRegistrationPayload } from "@/types/types";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface IregistrationProps {
   userName: string;
@@ -23,6 +24,7 @@ const RegistrationSection: React.FC<IregistrationProps> = ({
   onSubmit,
 }) => {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const handleUserName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserName(e.target.value);
   };
@@ -71,14 +73,18 @@ const RegistrationSection: React.FC<IregistrationProps> = ({
         </div>
         <div>
           <p>Password</p>
-          <Input
-            type="password"
-            onChange={handlePassword}
-            value={password}
-            placeholder="Enter your password"
-            className="w-full mx-auto my-[8px]"
-            isRequired
-          />
+          <div className="relative">
+            <Input
+              type={showPassword ? "password" : "text"}
+              onChange={handlePassword}
+              value={password}
+              placeholder="Enter your password"
+              className="w-full mx-auto my-[8px]"
+              isRequired
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+            />
+          </div>
         </div>
         <Button
           btnText="Signup"

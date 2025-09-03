@@ -1,8 +1,8 @@
 import Button from "@/components/atoms/button/button";
 import Input from "@/components/atoms/input/input";
 import { IloginPayload } from "@/types/types";
-import { Loader2 } from "lucide-react";
-import React from "react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface ILoginProps {
@@ -23,6 +23,7 @@ const LoginSection: React.FC<ILoginProps> = ({
   isLoading,
 }) => {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
@@ -57,14 +58,18 @@ const LoginSection: React.FC<ILoginProps> = ({
         </div>
         <div>
           <p>Password</p>
-          <Input
-            type="password"
-            onChange={handlePassword}
-            value={password}
-            placeholder="Enter your password"
-            className="w-full mx-auto my-[8px]"
-            isRequired
-          />
+          <div className="relative">
+            <Input
+              type={showPassword ? "password" : "text"}
+              onChange={handlePassword}
+              value={password}
+              placeholder="Enter your password"
+              className="w-full mx-auto my-[8px]"
+              isRequired
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+            />
+          </div>
         </div>
         <Button
           btnText={isLoading ? <Loader2 /> : "Login"}
