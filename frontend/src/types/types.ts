@@ -21,7 +21,7 @@ export interface IImage {
 }
 
 export interface IImageData {
-  _id: string;
+  imageId: string;
   user?: string;
   guestId?: string;
   trackingId: string;

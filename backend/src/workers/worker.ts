@@ -30,6 +30,7 @@ export const consumeQueue = async (io: Server) => {
   const channel = await connection.createChannel();
   channel.assertQueue("compress");
   channel.assertQueue("upload");
+  channel.assertQueue("bulkUpload");
   channel.consume("compress", async (msg) => {
     let consumerStarted = false;
     if (consumerStarted) return;
@@ -86,6 +87,7 @@ export const consumeQueue = async (io: Server) => {
         console.error("Filename is missing in the message");
         return;
       }
+      console.log("uyyyyyy", { userId, imageId, imageBuffer, originalname });
       const buffer = Buffer.from(imageBuffer, "base64");
       const originalImageUrl = await uploadToCloudinaryFromBuffer(
         buffer,
@@ -113,6 +115,6 @@ export const consumeQueue = async (io: Server) => {
       //   channel.nack(msg);
     }
   });
-
+  
   console.log("Waiting for messages in the queue...");
 };

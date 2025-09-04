@@ -2,8 +2,7 @@
 import Image, { StaticImageData } from "next/image";
 import Button from "@/components/atoms/button/button";
 import ProgressBar from "@/components/atoms/progressBar/progressBar";
-import { Loader2 } from "lucide-react";
-import { File } from "buffer";
+import exampleImage from "@/app/assets/images/upload.png";
 import Loader from "../loader/loader";
 
 interface IImagePreview {
@@ -28,7 +27,7 @@ const ImagePreview: React.FC<IImagePreview> = ({
       <div className="flex flex-col tab:flex-row gap-2 tab:justify-between w-full">
         <div className="w-[100px] h-[100px] relative">
           <Image
-            src={imgSrc || "https://via.placeholder.com/100"}
+            src={imgSrc || exampleImage}
             alt="compressed-image"
             fill
             className="object-contain p-[8px] rounded-[8px]"

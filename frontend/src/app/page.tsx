@@ -30,20 +30,8 @@ export default function Home() {
   const [isDrop, setIsDrop] = useState<boolean>(false);
   const [userId, setUserId] = useState("");
   const [active, setActive] = useState(0);
-  const [bulkImages, setBulkImages] = useState<any>([]);
-  const [
-    uploadImage,
-    { data: uploadedImageData, isSuccess, isLoading, isError, error },
-  ] = useUploadImageMutation();
-  const [
-    bulkUploadImage,
-    {
-      data: bulkUploadImageData,
-      isSuccess: isBulkUploadImageSuccess,
-      isLoading: isBulkUoloadImageLoading,
-      isError: isBulkUploadImageError,
-    },
-  ] = useBulkUploadImageMutation();
+  const [uploadImage] = useUploadImageMutation();
+  const [bulkUploadImage] = useBulkUploadImageMutation();
   const [
     compressImage,
     {
@@ -114,6 +102,12 @@ export default function Home() {
   };
 
   const handleBulkImageDrop = async (files: File[]) => {
+    if (!socket.connected) {
+      hasToken
+        ? (socket.io.opts.query = { userId: userId })
+        : (socket.io.opts.query = { userId: guestId });
+      socket.connect();
+    }
     if (!files || !Array.isArray(files)) {
       toast.error("Something went wrong!Try again");
       return;
@@ -341,12 +335,13 @@ export default function Home() {
 
   useEffect(() => {
     socket.on("uploadSuccess", (data) => {
-      console.log("uooo", data);
+      if (!data) return;
+      console.log("uoooooo", data);
       setImage((prev) => {
         if (prev.length === 0) return prev;
         return prev.map((img, index) => {
-          return img.trackingId === data?.trackingId ||
-            img.trackingId === bulkUploadImageData?.result?.trackingId
+          return img.trackingId === data?.trackingId &&
+            img.fileName === data?.originalname
             ? {
                 ...img,
                 imageId: data?.imageId,
@@ -365,37 +360,6 @@ export default function Home() {
   useEffect(() => {
     if (!isCompressionSuccess) return;
   }, [isCompressionSuccess]);
-
-  useEffect(() => {
-    if (!isBulkUploadImageSuccess || !bulkUploadImageData?.result) return;
-
-    const uploadedImages = bulkUploadImageData.result;
-
-    const uploadedMap = new Map<string, IImageData>(
-      uploadedImages.map((u: IImageData) => [
-        `${u.trackingId}-${u.filename}`,
-        u,
-      ])
-    );
-
-    setImage((prev: IImage[]) =>
-      prev.map((img) => {
-        const uploaded = uploadedMap.get(`${img.trackingId}-${img.fileName}`);
-
-        if (uploaded) {
-          return {
-            ...img,
-            imageId: uploaded._id,
-            originalImageFile: uploaded.originalImageUrl,
-            uploadProgress: 100,
-            done: true,
-          };
-        }
-
-        return img;
-      })
-    );
-  }, [isBulkUploadImageSuccess, bulkUploadImageData]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full bg-white p-4 tab:p-12 relative">
