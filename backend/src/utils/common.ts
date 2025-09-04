@@ -47,7 +47,7 @@ export const generateToken = async (tokenData: any): Promise<IToken> => {
         email: tokenData.email ?? "guest@gmail.com",
       },
       process.env.JWT_ACCESS_SECRET as string,
-      { expiresIn: "1m" }
+      { expiresIn: "1h" }
     );
     const refreshToken = jwt.sign(
       {
