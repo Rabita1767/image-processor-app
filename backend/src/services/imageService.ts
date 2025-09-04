@@ -283,7 +283,6 @@ class ImageService {
           HTTP_STATUS.BAD_REQUEST
         );
       }
-      console.log("files", files);
       let imageDocs;
       let uploadImages;
       if (userId) {

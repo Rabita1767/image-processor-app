@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import uploadToCloudinaryFromBuffer from "../utils/cloudinary";
 import AppError from "../utils/AppError";
 import { Messages } from "../utils/messages";
+import { getRabbitChannel } from "../config/rabbitMq";
 
 dotenv.config();
 
@@ -26,11 +27,7 @@ const compressAndUpload = async (
 };
 
 export const consumeQueue = async (io: Server) => {
-  const connection = await amqp.connect(process.env.RABBITMQ_URL as string);
-  const channel = await connection.createChannel();
-  channel.assertQueue("compress");
-  channel.assertQueue("upload");
-  channel.assertQueue("bulkUpload");
+  const channel = await getRabbitChannel();
   channel.consume("compress", async (msg) => {
     let consumerStarted = false;
     if (consumerStarted) return;
@@ -87,7 +84,6 @@ export const consumeQueue = async (io: Server) => {
         console.error("Filename is missing in the message");
         return;
       }
-      console.log("uyyyyyy", { userId, imageId, imageBuffer, originalname });
       const buffer = Buffer.from(imageBuffer, "base64");
       const originalImageUrl = await uploadToCloudinaryFromBuffer(
         buffer,
@@ -115,6 +111,6 @@ export const consumeQueue = async (io: Server) => {
       //   channel.nack(msg);
     }
   });
-  
+
   console.log("Waiting for messages in the queue...");
 };
