@@ -17,8 +17,6 @@ import {
   useBulkUploadImageMutation,
 } from "@/redux/services/api";
 import imageCompression from "browser-image-compression";
-import { format } from "path";
-import build from "next/dist/build";
 
 export default function Home() {
   const router = useRouter();
@@ -57,6 +55,12 @@ export default function Home() {
   ] = useCompressImageMutation();
 
   const handleImageDrop = async (file: File) => {
+    if (!socket.connected) {
+      hasToken
+        ? (socket.io.opts.query = { userId: userId })
+        : (socket.io.opts.query = { userId: guestId });
+      socket.connect();
+    }
     if (Array.isArray(file)) {
       console.error("cant upload more than one file");
     }
@@ -336,23 +340,28 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!isSuccess) return;
-    setImage((prev) => {
-      if (prev.length === 0) return prev;
-      return prev.map((img, index) => {
-        return img.trackingId === uploadedImageData?.result?.trackingId ||
-          img.trackingId === bulkUploadImageData?.result?.trackingId
-          ? {
-              ...img,
-              imageId: uploadedImageData?.result?._id,
-              originalImageFile: uploadedImageData?.result?.originalImageUrl,
-              uploadProgress: 100,
-              done: true,
-            }
-          : img;
+    socket.on("uploadSuccess", (data) => {
+      console.log("uooo", data);
+      setImage((prev) => {
+        if (prev.length === 0) return prev;
+        return prev.map((img, index) => {
+          return img.trackingId === data?.trackingId ||
+            img.trackingId === bulkUploadImageData?.result?.trackingId
+            ? {
+                ...img,
+                imageId: data?.imageId,
+                originalImageFile: data?.originalImageUrl,
+                uploadProgress: 100,
+                done: true,
+              }
+            : img;
+        });
       });
     });
-  }, [isSuccess]);
+    return () => {
+      socket.off("uploadSuccess");
+    };
+  }, []);
   useEffect(() => {
     if (!isCompressionSuccess) return;
   }, [isCompressionSuccess]);

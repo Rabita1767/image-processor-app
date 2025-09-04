@@ -112,6 +112,52 @@ class ImageService {
     }
   }
 
+  // public async uploadImage(
+  //   file: any,
+  //   payload: IUploadPayload,
+  //   userId?: mongoose.Types.ObjectId
+  // ) {
+  //   try {
+  //     if (!file) {
+  //       throw new AppError(
+  //         Messages.PLEASE_UPLOAD_A_FILE,
+  //         HTTP_STATUS.BAD_REQUEST
+  //       );
+  //     }
+  //     const { buffer, originalname } = file;
+  //     const imageUrl = await uploadToCloudinaryFromBuffer(buffer, originalname);
+  //     let uploadImage;
+  //     if (userId) {
+  //       uploadImage = await imageRepository.uploadImageAsUser(
+  //         userId,
+  //         originalname,
+  //         imageUrl,
+  //         payload.trackingId
+  //       );
+  //     } else {
+  //       uploadImage = await imageRepository.uploadImageAsGuest(
+  //         payload.guestId,
+  //         originalname,
+  //         imageUrl,
+  //         payload.trackingId
+  //       );
+  //     }
+  //     if (!uploadImage) {
+  //       throw new AppError(
+  //         Messages.ERROR_UPLOADING_IMAGE,
+  //         HTTP_STATUS.BAD_REQUEST
+  //       );
+  //     }
+  //     return uploadImage;
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw new AppError(
+  //       Messages.ERROR_UPLOADING_IMAGE,
+  //       HTTP_STATUS.INTERNAL_SERVER_ERROR
+  //     );
+  //   }
+  // }
+
   public async uploadImage(
     file: any,
     payload: IUploadPayload,
@@ -125,20 +171,17 @@ class ImageService {
         );
       }
       const { buffer, originalname } = file;
-      const imageUrl = await uploadToCloudinaryFromBuffer(buffer, originalname);
       let uploadImage;
       if (userId) {
         uploadImage = await imageRepository.uploadImageAsUser(
           userId,
           originalname,
-          imageUrl,
           payload.trackingId
         );
       } else {
         uploadImage = await imageRepository.uploadImageAsGuest(
           payload.guestId,
           originalname,
-          imageUrl,
           payload.trackingId
         );
       }
@@ -148,6 +191,19 @@ class ImageService {
           HTTP_STATUS.BAD_REQUEST
         );
       }
+      const channel = await getRabbitChannel();
+      channel.sendToQueue(
+        "upload",
+        Buffer.from(
+          JSON.stringify({
+            imageId: uploadImage._id,
+            imageBuffer: buffer.toString("base64"),
+            originalname: originalname,
+            userId: userId ? userId : payload.guestId,
+          })
+        )
+      );
+
       return uploadImage;
     } catch (error) {
       console.log(error);

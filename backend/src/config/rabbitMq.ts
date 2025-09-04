@@ -10,6 +10,7 @@ export const rabbitMqConnection = async () => {
     const connection = await amqp.connect(rabbitUrl);
     channel = await connection.createChannel();
     await channel.assertQueue("compress");
+    await channel.assertQueue("upload");
   } catch (error) {
     console.error("Error connecting to RabbitMQ", error);
     throw new Error("RabbitMQ connection failed");

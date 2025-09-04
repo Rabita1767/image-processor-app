@@ -6,13 +6,11 @@ class ImageRepository {
   public async uploadImageAsGuest(
     userId: string | undefined,
     fileName: any,
-    originalImageUrl: string,
     trackingId: string
   ): Promise<IImage> {
     return await ImageModel.create({
       guestId: userId,
       filename: fileName,
-      originalImageUrl: originalImageUrl,
       trackingId: trackingId,
     });
   }
@@ -20,14 +18,14 @@ class ImageRepository {
   public async uploadImageAsUser(
     userId: mongoose.Types.ObjectId,
     fileName: any,
-    originalImageUrl: string,
+
     trackingId: string
   ): Promise<IImage> {
     console.log("enterr", userId);
     return await ImageModel.create({
       user: userId,
       filename: fileName,
-      originalImageUrl: originalImageUrl,
+
       trackingId: trackingId,
     });
   }
@@ -57,6 +55,20 @@ class ImageRepository {
       {
         processedImageUrl: outputPath,
         status: "done",
+      },
+      { new: true }
+    );
+  }
+
+  public async findByIdAndUpdateUpload(
+    imgId: string,
+    originalImageUrl: string
+  ): Promise<IImage | null> {
+    return await ImageModel.findByIdAndUpdate(
+      imgId,
+      {
+        originalImageUrl: originalImageUrl,
+        status: "uploaded",
       },
       { new: true }
     );

@@ -7,11 +7,11 @@ const imageSchema = new Schema<IImage>(
     guestId: { type: String },
     trackingId: { type: String, required: true },
     filename: { type: String, required: true },
-    originalImageUrl: { type: String, required: true },
+    originalImageUrl: { type: String },
     processedImageUrl: { type: String },
     status: {
       type: String,
-      enum: ["pending", "processing", "done", "failed"],
+      enum: ["pending", "uploaded", "processing", "done", "failed"],
       default: "pending",
     },
   },
