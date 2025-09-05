@@ -21,7 +21,6 @@ class ImageRepository {
 
     trackingId: string
   ): Promise<IImage> {
-    console.log("enterr", userId);
     return await ImageModel.create({
       user: userId,
       filename: fileName,
@@ -34,7 +33,6 @@ class ImageRepository {
     userId: mongoose.Types.ObjectId | undefined,
     payload: IFile
   ): Promise<IImage> {
-    console.log("userrrrr", userId);
     return await ImageModel.create({
       user: userId,
       filename: payload.filename,

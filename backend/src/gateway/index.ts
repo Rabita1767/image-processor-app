@@ -9,10 +9,6 @@ const socketGateway = async (socket: Socket) => {
   const token = socket.handshake.auth.token || "";
   socket.join(userId);
   const users: any = {};
-  console.log("tokkkeeeeeeen", token);
-  console.log("userId", userId);
-  console.log("New client connected", socket.id);
-
   socket.emit("hello", {
     message: "Hello from the server!",
     socketId: socket.id,
